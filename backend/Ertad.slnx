@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Ertad.Api/Ertad.Api.csproj" />
+  <Project Path="Ertad.Tests/Ertad.Tests.csproj" />
+</Solution>

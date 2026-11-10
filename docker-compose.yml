@@ -1,0 +1,16 @@
+# Local PostgreSQL for development. Same credentials as backend/Ertad.Api/appsettings.json.
+# If you already run PostgreSQL on 5432 (e.g. a Windows install), you don't need this.
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ertad
+    ports:
+      - "5432:5432"
+    volumes:
+      - ertad-db:/var/lib/postgresql/data
+
+volumes:
+  ertad-db:

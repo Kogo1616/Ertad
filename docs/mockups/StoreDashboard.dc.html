@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ka">
+<head>
+<meta charset="utf-8">
+<title>მაღაზია — მოთხოვნები და შეთავაზება</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#6A4BE0}a:hover{color:#4F33BF}
+</style>
+</helmet>
+<div style="min-height: 1020px; background: #F4F1FF; font-family: 'Noto Sans Georgian', system-ui, sans-serif; color: #1F1640; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 0">
+  <nav aria-label="მთავარი მენიუ" style="flex: 1 1 230px; max-width: 100%; padding: 24px 16px; display: flex; flex-direction: column; gap: 6px; align-self: stretch">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 0 8px 22px">
+      <span style="display: flex">
+        <span style="width: 22px; height: 22px; border-radius: 50%; background: #6A4BE0"></span>
+        <span style="width: 22px; height: 22px; border-radius: 50%; background: #FFD9EA; margin-left: -8px"></span>
+        <span style="width: 22px; height: 22px; border-radius: 50%; background: #CFF3E4; margin-left: -8px"></span>
+      </span>
+      <span style="font-size: 22px; font-weight: 800">ერთად</span>
+    </div>
+    <a href="#" style="display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 14px; border-radius: 16px; background: #FFFFFF; color: #1F1640; text-decoration: none; font-size: 14px; font-weight: 700"><span style="width: 10px; height: 10px; border-radius: 50%; background: #6A4BE0"></span>მოთხოვნები</a>
+    <a href="StoreNewDeal.dc.html" style="display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 14px; border-radius: 16px; color: #5E5880; text-decoration: none; font-size: 14px; font-weight: 600"><span style="width: 10px; height: 10px; border-radius: 50%; background: #D6CCFF"></span>შეთავაზებები</a>
+    <a href="StoreRedeem.dc.html" style="display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 14px; border-radius: 16px; color: #5E5880; text-decoration: none; font-size: 14px; font-weight: 600"><span style="width: 10px; height: 10px; border-radius: 50%; background: #D6CCFF"></span>კოდის შემოწმება</a>
+    <a href="#" style="display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 14px; border-radius: 16px; color: #5E5880; text-decoration: none; font-size: 14px; font-weight: 600"><span style="width: 10px; height: 10px; border-radius: 50%; background: #D6CCFF"></span>ანგარიშები</a>
+    <div style="margin-top: 20px; background: #FFE2D2; border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 4px">
+      <span style="font-size: 13px; font-weight: 700; color: #7A3010">[მაღაზიის სახელი]</span>
+      <span style="font-size: 12px; color: #7A3010">ქუთაისი · პილოტი</span>
+    </div>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 28px 28px 28px 8px; display: flex; flex-direction: column; gap: 20px; max-width: 1200px">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 14px">
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <h1 style="margin: 0; font-size: 28px; font-weight: 800">გამარჯობა! რას ითხოვენ მყიდველები</h1>
+        <p style="margin: 0; font-size: 14px; color: #5E5880">უპასუხე მოთხოვნას ან გამოაცხადე შეთავაზება შენი ინიციატივით.</p>
+      </div>
+      <a href="StoreNewDeal.dc.html" style="height: 50px; padding: 0 20px; border-radius: 18px; background: #6A4BE0; color: #FFFFFF; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; text-decoration: none">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+        ახალი შეთავაზება
+      </a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px">
+      <div style="background: #E9E3FF; border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; color: #3A22A3">დაინტერესებული</span><span style="font-size: 30px; font-weight: 800; color: #2A1780">37</span></div>
+      <div style="background: #CFF3E4; border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; color: #0B5A3F">აქტიური შეთავაზება</span><span style="font-size: 30px; font-weight: 800; color: #08452F">1</span></div>
+      <div style="background: #FFF1BF; border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; color: #5C4300">ჯავშანი</span><span style="font-size: 30px; font-weight: 800; color: #4A3600">7 / 10</span></div>
+      <div style="background: #FFD9EA; border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 13px; color: #7A1A4B">გატანილი</span><span style="font-size: 30px; font-weight: 800; color: #63143D">4</span></div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+      <section style="flex: 2 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+        <sc-for list="{{rows}}" as="r" hint-placeholder-count="4">
+          <div style="{{r.cardStyle}}">
+            <span style="{{r.iconStyle}}">{{r.initial}}</span>
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+              <div style="display: flex; justify-content: space-between; gap: 8px">
+                <span style="font-size: 15px; font-weight: 700">{{r.name}}</span>
+                <span style="font-size: 13px; color: #5E5880; white-space: nowrap">{{r.price}} · სურვილი ~{{r.median}}</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px">
+                <div style="flex: 1; height: 10px; background: #F4F1FF; border-radius: 999px; overflow: hidden"><div style="{{r.barStyle}}"></div></div>
+                <span style="font-size: 13px; font-weight: 700; white-space: nowrap">{{r.interested}} ითხოვს</span>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </section>
+
+      <section style="flex: 1 1 340px; min-width: 0; background: #FFFFFF; border-radius: 28px; padding: 22px; display: flex; flex-direction: column; gap: 18px">
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <span style="font-size: 12px; font-weight: 600; color: #6A4BE0">არჩეული</span>
+          <h2 style="margin: 0; font-size: 20px; font-weight: 800">ბლენდერი 600W · 80 ₾</h2>
+          <span style="font-size: 13px; color: #5E5880">18 ითხოვს · 12-მა მიუთითა ფასი</span>
+        </div>
+
+        <div style="display: flex; align-items: flex-end; gap: 10px; height: 130px; padding: 0 4px">
+          <sc-for list="{{dist}}" as="d" hint-placeholder-count="5">
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; height: 100%">
+              <span style="font-size: 13px; font-weight: 800">{{d.n}}</span>
+              <div style="{{d.barStyle}}"></div>
+              <span style="font-size: 11px; color: #5E5880; white-space: nowrap">{{d.label}}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <form style="display: flex; flex-direction: column; gap: 12px; background: #F4F1FF; border-radius: 22px; padding: 16px">
+          <span style="font-size: 15px; font-weight: 800">შესთავაზე ჯგუფს</span>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+            <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 600; color: #5E5880">ფასი, ₾
+              <input type="text" value="60" style="height: 46px; border: 0; border-radius: 14px; padding: 0 14px; font: inherit; font-size: 16px; font-weight: 700; color: #1F1640; background: #FFFFFF"></label>
+            <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 600; color: #5E5880">მინ. ჯგუფი
+              <input type="text" value="10" style="height: 46px; border: 0; border-radius: 14px; padding: 0 14px; font: inherit; font-size: 16px; font-weight: 700; color: #1F1640; background: #FFFFFF"></label>
+            <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 600; color: #5E5880">მარაგი
+              <input type="text" value="20" style="height: 46px; border: 0; border-radius: 14px; padding: 0 14px; font: inherit; font-size: 16px; font-weight: 700; color: #1F1640; background: #FFFFFF"></label>
+            <label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 600; color: #5E5880">ვადა
+              <input type="text" value="პარ, 18:00" style="height: 46px; border: 0; border-radius: 14px; padding: 0 14px; font: inherit; font-size: 16px; font-weight: 700; color: #1F1640; background: #FFFFFF"></label>
+          </div>
+          <p style="margin: 0; font-size: 13px; color: #0B5A3F; background: #CFF3E4; border-radius: 14px; padding: 10px 12px; line-height: 1.5">60 ₾ ან მეტს 7 ადამიანი ელოდება. შეტყობინებას 18-ვე მიიღებს.</p>
+          <button type="button" style="height: 52px; border: 0; border-radius: 18px; background: #6A4BE0; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 700">გამოქვეყნება</button>
+        </form>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1020}}'>
+class Component extends DCLogic {
+renderVals() {
+const tones = [['#E9E3FF', '#3A22A3', '#6A4BE0'], ['#CFF3E4', '#0B5A3F', '#3FBF8E'], ['#FFF1BF', '#5C4300', '#E8B931'], ['#FFD9EA', '#7A1A4B', '#F07AAE']];
+const raw = [
+  { name: 'ბლენდერი 600W', initial: 'ბ', price: '80 ₾', median: '60 ₾', interested: 18, sel: true },
+  { name: 'ელ. ჩაიდანი 1.7 ლ', initial: 'ჩ', price: '65 ₾', median: '50 ₾', interested: 9 },
+  { name: 'ორთქლის უთო', initial: 'უ', price: '120 ₾', median: '95 ₾', interested: 6 },
+  { name: 'თმის ფენი 2000W', initial: 'ფ', price: '90 ₾', median: '70 ₾', interested: 4 }
+];
+const rows = raw.map((r, i) => {
+  const t = tones[i];
+  return { ...r,
+    cardStyle: 'display: flex; align-items: center; gap: 14px; background: #FFFFFF; border-radius: 22px; padding: 14px 16px;' + (r.sel ? ' box-shadow: 0 0 0 2px #6A4BE0;' : ''),
+    iconStyle: 'width: 48px; height: 48px; flex: none; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; background: ' + t[0] + '; color: ' + t[1],
+    barStyle: 'height: 100%; border-radius: 999px; width: ' + Math.round(r.interested / 20 * 100) + '%; background: ' + t[2] };
+});
+const max = 7;
+const dist = [
+  { label: '≤50', n: 3, c: '#D6CCFF' },
+  { label: '55', n: 2, c: '#D6CCFF' },
+  { label: '60', n: 7, c: '#6A4BE0' },
+  { label: '65+', n: 0, c: '#D6CCFF' },
+  { label: 'ფასის გარეშე', n: 6, c: '#FFE2D2' }
+].map(d => ({ ...d, barStyle: 'width: 100%; border-radius: 12px; min-height: 6px; height: ' + Math.round(d.n / max * 80) + 'px; background: ' + d.c }));
+return { rows, dist };
+}
+}
+</script>
+</body>
+</html>

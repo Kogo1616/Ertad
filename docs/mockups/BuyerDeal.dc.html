@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ka">
+<head>
+<meta charset="utf-8">
+<title>ჯგუფური შეთავაზება — ჯავშანი</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#6A4BE0}a:hover{color:#4F33BF}
+</style>
+</helmet>
+<div style="min-height: 1000px; background: #F4F1FF; font-family: 'Noto Sans Georgian', system-ui, sans-serif; color: #1F1640">
+  <header style="background: #FFFFFF; border-bottom: 1px solid #E6E0FA">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 14px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px">
+      <a href="#" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #1F1640">
+        <span style="display: flex"><span style="width: 22px; height: 22px; border-radius: 50%; background: #6A4BE0"></span><span style="width: 22px; height: 22px; border-radius: 50%; background: #FFD9EA; margin-left: -8px"></span><span style="width: 22px; height: 22px; border-radius: 50%; background: #CFF3E4; margin-left: -8px"></span></span>
+        <span style="font-size: 22px; font-weight: 800">ერთად</span>
+      </a>
+      <nav aria-label="მთავარი მენიუ" style="display: flex; flex-wrap: wrap; gap: 4px 20px; font-size: 14px; font-weight: 600">
+        <a href="#" style="color: #5E5880; text-decoration: none">მაღაზიები</a>
+        <a href="#" style="color: #1F1640; text-decoration: none">აქტიური შეთავაზებები</a>
+        <a href="#" style="color: #5E5880; text-decoration: none">როგორ მუშაობს</a>
+      </nav>
+      <div style="flex: 1 1 220px; display: flex; align-items: center; gap: 8px; height: 44px; background: #F4F1FF; border-radius: 999px; padding: 0 16px; color: #5E5880">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+        <input type="search" aria-label="ძიება" placeholder="მოძებნე პროდუქტი ან მაღაზია" style="flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: inherit; font-size: 14px; color: #1F1640">
+      </div>
+      <a href="#" style="font-size: 14px; font-weight: 700; color: #6A4BE0; text-decoration: none">ჩემი ჯავშნები</a>
+      <a href="#" style="height: 44px; padding: 0 20px; border-radius: 999px; background: #1F1640; color: #FFFFFF; font-size: 14px; font-weight: 700; display: flex; align-items: center; text-decoration: none">შესვლა</a>
+    </div>
+  </header>
+
+  <main style="max-width: 1200px; margin: 0 auto; padding: 28px 24px; display: flex; flex-direction: column; gap: 24px">
+    <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: stretch">
+      <section style="flex: 3 1 520px; min-width: 0; position: relative; background: #6A4BE0; color: #FFFFFF; border-radius: 32px; padding: 32px; overflow: hidden; display: flex; flex-direction: column; gap: 18px">
+        <span style="position: absolute; width: 260px; height: 260px; border-radius: 50%; background: #7E63EA; right: -60px; top: -80px"></span>
+        <span style="position: absolute; width: 120px; height: 120px; border-radius: 50%; background: #7E63EA; right: 160px; bottom: -60px"></span>
+        <span style="position: absolute; right: 36px; top: 32px; width: 92px; height: 92px; border-radius: 50%; background: #FFF1BF; color: #7A5A00; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; transform: rotate(-10deg)">−25%</span>
+        <div style="position: relative; display: flex; align-items: center; gap: 14px">
+          <span style="width: 64px; height: 64px; border-radius: 18px; background: #CFF3E4; color: #0E6B4B; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700">ფოტო</span>
+          <div style="display: flex; flex-direction: column"><span style="font-size: 20px; font-weight: 800">ბლენდერი 600W</span><span style="font-size: 14px; color: #E9E3FF">[მაღაზია] · ქუთაისი</span></div>
+        </div>
+        <div style="position: relative; display: flex; align-items: baseline; gap: 14px">
+          <span style="font-size: 72px; font-weight: 800; line-height: 1">60 ₾</span>
+          <span style="font-size: 26px; color: #D6CCFF; text-decoration: line-through">80 ₾</span>
+        </div>
+        <span style="position: relative; font-size: 16px; color: #F4F1FF">ფასი აქტიურდება, თუ 10 ადამიანი შეგროვდება პარასკევის 18:00-მდე</span>
+        <div style="position: relative; display: flex; gap: 10px; flex-wrap: wrap">
+          <div style="background: #FFF1BF; border-radius: 18px; padding: 10px 18px; display: flex; flex-direction: column; align-items: center; min-width: 84px"><span style="font-size: 26px; font-weight: 800; color: #5C4300">1</span><span style="font-size: 12px; color: #6B5000">დღე</span></div>
+          <div style="background: #FFF1BF; border-radius: 18px; padding: 10px 18px; display: flex; flex-direction: column; align-items: center; min-width: 84px"><span style="font-size: 26px; font-weight: 800; color: #5C4300">06</span><span style="font-size: 12px; color: #6B5000">საათი</span></div>
+          <div style="background: #FFF1BF; border-radius: 18px; padding: 10px 18px; display: flex; flex-direction: column; align-items: center; min-width: 84px"><span style="font-size: 26px; font-weight: 800; color: #5C4300">12</span><span style="font-size: 12px; color: #6B5000">წუთი</span></div>
+        </div>
+      </section>
+
+      <section style="flex: 2 1 360px; min-width: 0; background: #FFFFFF; border-radius: 32px; padding: 28px; display: flex; flex-direction: column; gap: 18px">
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <span style="font-size: 20px; font-weight: 800">ჯგუფი: 7 / 10</span>
+          <span style="background: #FFE2D2; color: #9A3F14; border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 700">კიდევ 3!</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px">
+          <sc-for list="{{slots}}" as="s" hint-placeholder-count="10">
+            <span style="{{s.style}}">{{s.label}}</span>
+          </sc-for>
+        </div>
+        <button style="height: 58px; border: 0; border-radius: 20px; background: #6A4BE0; color: #FFFFFF; font: inherit; font-size: 17px; font-weight: 700">შემოუერთდი 60 ₾-ად</button>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <label for="share" style="font-size: 13px; font-weight: 700">მოიწვიე მეგობარი — ყველას დააახლოებ ფასთან</label>
+          <div style="display: flex; gap: 8px">
+            <input id="share" type="text" readonly value="ertad.ge/d/blender-60" style="flex: 1; min-width: 0; height: 48px; border: 0; border-radius: 16px; background: #F4F1FF; padding: 0 14px; font: inherit; font-size: 14px; color: #1F1640">
+            <button style="height: 48px; padding: 0 18px; border: 0; border-radius: 16px; background: #E9E3FF; color: #3A22A3; font: inherit; font-size: 14px; font-weight: 700">კოპირება</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px">
+      <div style="background: #CFF3E4; border-radius: 24px; padding: 20px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 16px; font-weight: 700; color: #08452F">წინასწარ 0 ₾</span><span style="font-size: 13px; color: #0B5A3F">გადახდა მხოლოდ მაღაზიაში, ნივთის გატანისას</span></div>
+      <div style="background: #FFFFFF; border-radius: 24px; padding: 20px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 16px; font-weight: 700">ვერ შეგროვდა?</span><span style="font-size: 13px; color: #5E5880">ჯავშანი ავტომატურად უქმდება, არაფერს კარგავ</span></div>
+      <div style="background: #FFFFFF; border-radius: 24px; padding: 20px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 16px; font-weight: 700">მარაგი: 13 / 20</span><span style="font-size: 13px; color: #5E5880">გატანა 3 დღეში · გარანტია [პირობა]</span></div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1000}}'>
+class Component extends DCLogic {
+renderVals() {
+const people = [['ნ', '#FFD9EA', '#8A1F55'], ['ლ', '#FFF1BF', '#7A5A00'], ['გ', '#CFF3E4', '#0E6B4B'], ['თ', '#E9E3FF', '#4F33BF'], ['მ', '#FFE2D2', '#9A3F14'], ['ს', '#CFF3E4', '#0E6B4B'], ['ა', '#FFD9EA', '#8A1F55']];
+const base = 'aspect-ratio: 1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800;';
+const slots = [];
+for (let i = 0; i < 10; i++) {
+  const p = people[i];
+  slots.push(p
+    ? { label: p[0], style: base + ' background: ' + p[1] + '; color: ' + p[2] }
+    : { label: '+', style: base + ' border: 2px dashed #B9ADEF; color: #6A4BE0; background: #FFFFFF' });
+}
+return { slots };
+}
+}
+</script>
+</body>
+</html>
