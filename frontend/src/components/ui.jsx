@@ -6,9 +6,9 @@ export function Logo({ to = '/deals' }) {
   return (
     <Link to={to} className="logo" aria-label="ერთად — მთავარი">
       <span className="logo-dots">
-        <span style={{ background: '#6A4BE0' }} />
-        <span style={{ background: '#FFD9EA' }} />
-        <span style={{ background: '#CFF3E4' }} />
+        <span style={{ background: 'var(--violet)' }} />
+        <span style={{ background: 'var(--pink)' }} />
+        <span style={{ background: 'var(--mint)' }} />
       </span>
       <span className="logo-text">ერთად</span>
     </Link>
@@ -28,8 +28,8 @@ export function ProductImage({ id, name, imageUrl, height = 170, radius, childre
 
 export function OriginBadge({ origin }) {
   return origin === 'FromRequests'
-    ? <span className="chip pimg-badge" style={{ background: '#6A4BE0', color: '#fff' }}>მყიდველების მოთხოვნით</span>
-    : <span className="chip pimg-badge" style={{ background: '#fff', color: '#9A3F14' }}>მაღაზიის შეთავაზება</span>
+    ? <span className="chip pimg-badge" style={{ background: 'var(--violet)', color: '#fff' }}>მყიდველების მოთხოვნით</span>
+    : <span className="chip pimg-badge" style={{ background: 'var(--surface)', color: 'var(--peach-ink)' }}>მაღაზიის შეთავაზება</span>
 }
 
 export function Progress({ value, max }) {
@@ -77,7 +77,7 @@ export function AvatarStack({ initials, total }) {
         const [bg, fg] = tone(i + 2)
         return <span key={i} className="avatar" style={{ background: bg, color: fg }}>{ch}</span>
       })}
-      {extra > 0 && <span className="avatar" style={{ background: '#E9E3FF', color: '#4F33BF', fontSize: 12 }}>+{extra}</span>}
+      {extra > 0 && <span className="avatar" style={{ background: 'var(--violet-soft)', color: 'var(--violet-ink)', fontSize: 12 }}>+{extra}</span>}
     </div>
   )
 }

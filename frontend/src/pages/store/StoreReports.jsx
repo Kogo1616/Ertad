@@ -17,7 +17,7 @@ export default function StoreReports() {
       <div className="tabs">
         {published.map((d) => (
           <Link key={d.id} to={`/store/reports/${d.id}`} className="filter" aria-pressed={d.id === current}
-            style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none', ...(d.id === current ? { background: '#1F1640', color: '#fff' } : {}) }}>
+            style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none', ...(d.id === current ? { background: 'var(--ink)', color: 'var(--surface)' } : {}) }}>
             {d.productName} · {money(d.groupPrice)}
           </Link>
         ))}

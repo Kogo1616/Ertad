@@ -9,12 +9,12 @@ export function ProductGrid({ products }) {
       {products.map((p) => (
         <Link key={p.id} to={`/stores/${p.storeId}/products/${p.id}`} className="product-card">
           <ProductImage id={p.id} name={p.name} imageUrl={p.imageUrl} height={140} radius={18}>
-            {p.dealSlug && <span className="chip pimg-badge" style={{ background: '#6A4BE0', color: '#fff' }}>ჯგუფური {money(p.dealPrice)}</span>}
+            {p.dealSlug && <span className="chip pimg-badge" style={{ background: 'var(--violet)', color: '#fff' }}>ჯგუფური {money(p.dealPrice)}</span>}
           </ProductImage>
           <span style={{ fontSize: 15, fontWeight: 700, padding: '0 4px' }}>{p.name}</span>
           <span className="row between" style={{ padding: '0 4px 4px', fontSize: 14 }}>
             <strong>{money(p.regularPrice)}</strong>
-            <span style={{ color: '#6A4BE0', fontWeight: 700 }}>{p.interestCount > 0 ? `${p.interestCount} ითხოვს` : 'მოითხოვე პირველმა'}</span>
+            <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{p.interestCount > 0 ? `${p.interestCount} ითხოვს` : 'მოითხოვე პირველმა'}</span>
           </span>
         </Link>
       ))}
@@ -32,7 +32,7 @@ export default function StorePage() {
     <main className="page">
       <nav aria-label="ნავიგაცია" className="row small muted">
         <Link to="/stores" className="muted">მაღაზიები</Link><span>/</span>
-        <span style={{ color: '#1F1640', fontWeight: 600 }}>{store.name}, {store.city}</span>
+        <span style={{ color: 'var(--ink)', fontWeight: 600 }}>{store.name}, {store.city}</span>
       </nav>
       <div className="page-head">
         <div className="stack-sm">

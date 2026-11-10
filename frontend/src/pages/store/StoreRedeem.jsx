@@ -57,11 +57,11 @@ export default function StoreRedeem() {
         {result && (
           <section className={'card ' + info.cls} style={{ flex: '1 1 380px', gap: 16 }} aria-live="polite">
             <div className="row" style={{ gap: 12 }}>
-              <span className="big-icon" style={{ width: 40, height: 40, background: '#fff' }}>{result.status === 'Valid' ? <CheckIcon size={22} /> : '!'}</span>
+              <span className="big-icon" style={{ width: 40, height: 40, background: 'var(--surface)' }}>{result.status === 'Valid' ? <CheckIcon size={22} /> : '!'}</span>
               <span style={{ fontSize: 20, fontWeight: 800 }}>{confirmed ? 'გატანა დადასტურდა ✓' : info.title}</span>
             </div>
             {result.productName && (
-              <div style={{ background: '#fff', borderRadius: 20, padding: 16, display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 14, color: '#1F1640' }}>
+              <div style={{ background: 'var(--surface)', borderRadius: 20, padding: 16, display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 14, color: 'var(--ink)' }}>
                 <div className="kv"><span>პროდუქტი</span><strong style={{ fontSize: 15 }}>{result.productName}</strong></div>
                 <div className="kv"><span>ჯგუფური ფასი</span><strong style={{ fontSize: 22, fontWeight: 800 }}>{money(result.price)}</strong></div>
                 <div className="kv"><span>ტელეფონი</span><strong style={{ fontSize: 15 }}>{result.maskedPhone}</strong></div>

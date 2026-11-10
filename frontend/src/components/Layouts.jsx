@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth'
 import { Loading, Logo, SearchIcon } from './ui'
+import ThemeToggle from './ThemeToggle'
 
 /** Public site: header with nav, search, my reservations, login. */
 export function SiteLayout() {
@@ -30,6 +31,7 @@ export function SiteLayout() {
             <input type="search" aria-label="ძიება" placeholder="მოძებნე პროდუქტი ან მაღაზია" value={q} onChange={(e) => setQ(e.target.value)} />
           </form>
           <Link to="/my/reservations" className="header-link">ჩემი ჯავშნები</Link>
+          <ThemeToggle />
           {buyer && (
             <button type="button" className="me-avatar" onClick={logout} title="გასვლა" aria-label={'გასვლა (' + me.phone + ')'}>{me.initial}</button>
           )}
@@ -62,6 +64,7 @@ export function StoreLayout() {
           <span style={{ fontSize: 12 }}>{me.storeCity} · პილოტი</span>
         </div>
         <button type="button" className="btn btn-white btn-sm" style={{ marginTop: 10 }} onClick={logout}>გასვლა</button>
+        <ThemeToggle />
       </nav>
       <main className="panel-main">
         <Outlet />

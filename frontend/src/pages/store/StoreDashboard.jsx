@@ -30,10 +30,10 @@ export default function StoreDashboard() {
       </div>
 
       <div className="kpis">
-        <div className="kpi tone-violet"><span>დაინტერესებული</span><strong style={{ color: '#2A1780' }}>{kpis.interested}</strong></div>
-        <div className="kpi tone-mint"><span>აქტიური შეთავაზება</span><strong style={{ color: '#08452F' }}>{kpis.activeDeals}</strong></div>
-        <div className="kpi tone-butter"><span>ჯავშანი</span><strong style={{ color: '#4A3600' }}>{kpis.reserved} / {kpis.needed}</strong></div>
-        <div className="kpi tone-pink"><span>გატანილი</span><strong style={{ color: '#63143D' }}>{kpis.redeemed}</strong></div>
+        <div className="kpi tone-violet"><span>დაინტერესებული</span><strong style={{ color: 'var(--violet-ink)' }}>{kpis.interested}</strong></div>
+        <div className="kpi tone-mint"><span>აქტიური შეთავაზება</span><strong style={{ color: 'var(--mint-ink)' }}>{kpis.activeDeals}</strong></div>
+        <div className="kpi tone-butter"><span>ჯავშანი</span><strong style={{ color: 'var(--butter-ink)' }}>{kpis.reserved} / {kpis.needed}</strong></div>
+        <div className="kpi tone-pink"><span>გატანილი</span><strong style={{ color: 'var(--pink-ink)' }}>{kpis.redeemed}</strong></div>
       </div>
 
       <div className="split" style={{ gap: 20, alignItems: 'flex-start' }}>
@@ -100,7 +100,7 @@ function OfferPanel({ product, onPublished }) {
   return (
     <section className="card" style={{ flex: '1 1 340px', gap: 18 }}>
       <div className="stack-sm" style={{ gap: 2 }}>
-        <span style={{ fontSize: 12, fontWeight: 600, color: '#6A4BE0' }}>არჩეული</span>
+        <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--accent)' }}>არჩეული</span>
         <h2 style={{ fontSize: 20 }}>{product.name} · {money(product.regularPrice)}</h2>
         <span className="small muted">{demand.interestCount} ითხოვს · {demand.withPrice}-მა მიუთითა ფასი</span>
       </div>
@@ -112,7 +112,7 @@ function OfferPanel({ product, onPublished }) {
       ) : done ? (
         <div className="note">გამოქვეყნდა! <a href={`/d/${done}`} target="_blank" rel="noreferrer">საჯარო გვერდი</a> · შეტყობინება {demand.interestCount}-მა მიიღო.</div>
       ) : (
-        <form className="stack" style={{ background: '#F4F1FF', borderRadius: 22, padding: 16, gap: 12 }} onSubmit={(e) => { e.preventDefault(); publish() }}>
+        <form className="stack" style={{ background: 'var(--bg)', borderRadius: 22, padding: 16, gap: 12 }} onSubmit={(e) => { e.preventDefault(); publish() }}>
           <strong style={{ fontSize: 15 }}>შესთავაზე ჯგუფს</strong>
           <div className="form-grid" style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
             <label className="field" htmlFor="o-price">ფასი, ₾<input id="o-price" className="input input-white" type="number" min="1" value={form.price} onChange={set('price')} required /></label>

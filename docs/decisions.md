@@ -39,3 +39,7 @@ Where the spec was ambiguous or the request changed it, we took the simplest opt
 
 ## Tests
 - Integration tests run against real PostgreSQL. With `ERTAD_TEST_DB` set (a server connection string), they use that server and create and drop one database per test. Without it, they start a Testcontainers `postgres:17-alpine` container (needs Docker).
+
+## Dark mode
+- Colors are CSS custom properties in `styles.css`. Dark values apply when the OS prefers dark, unless the user has chosen a theme with the header/sidebar toggle. The choice is stored in `localStorage` (`ertad-theme`) and set as `<html data-theme>` by an inline script in `index.html` before first paint, so there's no flash.
+- Violet buttons stay `#6A4BE0` in both modes (white text passes 4.5:1). Violet used as *text* is a separate token (`--accent`), lighter in dark mode.

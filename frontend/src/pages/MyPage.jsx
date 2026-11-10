@@ -16,7 +16,7 @@ export default function MyPage() {
         <h2>ჯავშნები</h2>
         {data.reservations.length === 0 && <div className="empty">ჯავშანი ჯერ არ გაქვს. <Link to="/deals">ნახე შეთავაზებები</Link></div>}
         {data.reservations.map((r) => (
-          <Link key={r.id} to={`/my/reservations/${r.id}`} className="prow" style={{ textDecoration: 'none', color: '#1F1640' }}>
+          <Link key={r.id} to={`/my/reservations/${r.id}`} className="prow" style={{ textDecoration: 'none', color: 'var(--ink)' }}>
             <div className="stack-sm" style={{ flex: 1, minWidth: 0, gap: 2 }}>
               <strong>{r.productName} · {money(r.groupPrice)}</strong>
               <span className="small muted">{r.storeName} · {dateTime(r.createdAt)} · ჯგუფი {r.confirmed} / {r.min}</span>
@@ -33,7 +33,7 @@ export default function MyPage() {
         <h2>ჩემი მოთხოვნები</h2>
         {data.interests.length === 0 && <div className="empty">მოთხოვნა ჯერ არ გაქვს. <Link to="/stores">გადახედე კატალოგს</Link></div>}
         {data.interests.map((i) => (
-          <Link key={i.id} to={`/stores/${i.storeId}/products/${i.productId}`} className="prow" style={{ textDecoration: 'none', color: '#1F1640' }}>
+          <Link key={i.id} to={`/stores/${i.storeId}/products/${i.productId}`} className="prow" style={{ textDecoration: 'none', color: 'var(--ink)' }}>
             <div className="stack-sm" style={{ flex: 1, minWidth: 0, gap: 2 }}>
               <strong>{i.productName}</strong>
               <span className="small muted">{i.storeName} · ჩვეულებრივ {money(i.regularPrice)} · სულ {i.interestCount} ითხოვს</span>

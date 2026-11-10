@@ -41,13 +41,13 @@ export function isoToTbilisiLocal(iso) {
   return d.toISOString().slice(0, 16)
 }
 
-// Pastel pairs [background, text] — all pass 4.5:1.
+// Pastel pairs [background, text] as CSS tokens, so they follow light/dark mode. All pass 4.5:1.
 export const TONES = [
-  ['#CFF3E4', '#0B5A3F'],
-  ['#FFF1BF', '#5C4300'],
-  ['#FFD9EA', '#7A1A4B'],
-  ['#E9E3FF', '#3A22A3'],
-  ['#FFE2D2', '#9A3F14'],
+  ['var(--mint)', 'var(--mint-ink)'],
+  ['var(--butter)', 'var(--butter-ink)'],
+  ['var(--pink)', 'var(--pink-ink)'],
+  ['var(--violet-soft)', 'var(--violet-ink)'],
+  ['var(--peach)', 'var(--peach-ink)'],
 ]
 export const tone = (i) => TONES[Math.abs(i) % TONES.length]
 

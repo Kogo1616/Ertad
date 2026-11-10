@@ -32,7 +32,7 @@ export default function StoresPage() {
                 <span className="icon-square" style={{ background: bg, color: fg }}>{s.name.replace('[', '')[0]}</span>
                 <span style={{ fontSize: 17, fontWeight: 800 }}>{s.name}</span>
                 <span className="small muted">{s.city} · {s.address}</span>
-                <span className="small" style={{ color: '#6A4BE0', fontWeight: 700 }}>{s.productCount} პროდუქტი</span>
+                <span className="small" style={{ color: 'var(--accent)', fontWeight: 700 }}>{s.productCount} პროდუქტი</span>
               </Link>
             )
           })}

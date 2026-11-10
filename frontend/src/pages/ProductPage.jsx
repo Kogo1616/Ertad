@@ -56,7 +56,7 @@ export default function ProductPage() {
       <nav aria-label="ნავიგაცია" className="row small muted" style={{ gap: 8 }}>
         <Link to="/stores" className="muted">მაღაზიები</Link><span>/</span>
         <Link to={`/stores/${p.store.id}`} className="muted">{p.store.name}, {p.store.city}</Link><span>/</span>
-        <span style={{ color: '#1F1640', fontWeight: 600 }}>{p.name}</span>
+        <span style={{ color: 'var(--ink)', fontWeight: 600 }}>{p.name}</span>
       </nav>
 
       <div className="split" style={{ gap: 28 }}>
@@ -64,15 +64,15 @@ export default function ProductPage() {
           <ProductImage id={p.id} name={p.name} imageUrl={p.imageUrl} height={440} radius={32}>
             {!p.imageUrl && <>
               <span aria-hidden="true" style={{ position: 'absolute', width: 300, height: 300, borderRadius: '50%', background: 'rgba(255,255,255,.35)', right: -80, top: -90 }} />
-              <span aria-hidden="true" style={{ position: 'absolute', width: 150, height: 150, borderRadius: '50%', background: '#FFF1BF', left: 40, bottom: -50, opacity: bg === '#FFF1BF' ? 0 : 1 }} />
-              <span className="chip pimg-badge" style={{ left: 20, top: 20, background: '#fff', color: '#0E6B4B' }}>[პროდუქტის ფოტო]</span>
+              <span aria-hidden="true" style={{ position: 'absolute', width: 150, height: 150, borderRadius: '50%', background: 'var(--butter)', left: 40, bottom: -50, opacity: bg === 'var(--butter)' ? 0 : 1 }} />
+              <span className="chip pimg-badge" style={{ left: 20, top: 20, background: 'var(--surface)', color: 'var(--mint-ink)' }}>[პროდუქტის ფოტო]</span>
             </>}
           </ProductImage>
         </div>
 
         <div className="stack" style={{ flex: '1 1 400px', gap: 18 }}>
-          <Link to={`/stores/${p.store.id}`} className="chip" style={{ alignSelf: 'flex-start', background: '#fff', color: '#1F1640', padding: '6px 14px 6px 6px', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>
-            <span className="avatar" style={{ width: 28, height: 28, border: 0, background: '#FFE2D2', color: '#9A3F14' }}>{p.store.name.replace('[', '')[0]}</span>
+          <Link to={`/stores/${p.store.id}`} className="chip" style={{ alignSelf: 'flex-start', background: 'var(--surface)', color: 'var(--ink)', padding: '6px 14px 6px 6px', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>
+            <span className="avatar" style={{ width: 28, height: 28, border: 0, background: 'var(--peach)', color: 'var(--peach-ink)' }}>{p.store.name.replace('[', '')[0]}</span>
             {p.store.name} · {p.store.city}
           </Link>
           <div className="stack-sm" style={{ gap: 4 }}>

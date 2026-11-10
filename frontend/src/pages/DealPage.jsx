@@ -106,7 +106,7 @@ export default function DealPage() {
             <label htmlFor="share" style={{ fontSize: 13, fontWeight: 700 }}>მოიწვიე მეგობარი — ყველას დააახლოებ ფასთან</label>
             <div className="row" style={{ gap: 8, flexWrap: 'nowrap' }}>
               <input id="share" className="input" style={{ fontSize: 14, fontWeight: 500 }} readOnly value={shareUrl} onFocus={(e) => e.target.select()} />
-              <CopyButton text={shareUrl} className="btn btn-sm" style={{ height: 48, background: '#E9E3FF', color: '#3A22A3' }} />
+              <CopyButton text={shareUrl} className="btn btn-sm" style={{ height: 48, background: 'var(--violet-soft)', color: 'var(--violet-ink)' }} />
             </div>
           </div>
         </section>
@@ -114,7 +114,7 @@ export default function DealPage() {
 
       <section className="grid-auto" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))' }}>
         <div className="tile tone-mint" style={{ gap: 4 }}>
-          <strong style={{ color: '#08452F' }}>წინასწარ 0 ₾</strong>
+          <strong style={{ color: 'var(--mint-ink)' }}>წინასწარ 0 ₾</strong>
           <span className="small">გადახდა მხოლოდ მაღაზიაში, ნივთის გატანისას</span>
         </div>
         <div className="tile tone-white" style={{ gap: 4 }}>

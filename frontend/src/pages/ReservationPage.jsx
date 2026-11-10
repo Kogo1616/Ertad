@@ -58,7 +58,7 @@ export default function ReservationPage() {
       {r.status === 'Confirmed' && r.code && (
         <>
           <Confetti />
-          <Headline icon={<CheckIcon />} bg="#CFF3E4" fg="#0E6B4B" title="ჯგუფი შეივსო!"
+          <Headline icon={<CheckIcon />} bg="var(--mint)" fg="var(--mint-ink)" title="ჯგუფი შეივსო!"
             text={`${deal.confirmed}-მა ადამიანმა ერთად მოიპოვა ${money(deal.groupPrice)}-იანი ფასი. შენ ${money(r.saving)} დაზოგე.`} />
           <section className="ticket">
             <div className="ticket-left">
@@ -84,7 +84,7 @@ export default function ReservationPage() {
 
       {r.status === 'Confirmed' && !r.code && (
         <>
-          <Headline icon="⏳" bg="#FFF1BF" fg="#5C4300" title="ადგილი დაჯავშნილია!"
+          <Headline icon="⏳" bg="var(--butter)" fg="var(--butter-ink)" title="ადგილი დაჯავშნილია!"
             text={`ჯგუფს კიდევ ${need} სჭირდება ${when(deal.deadline)}-მდე. შეივსება თუ არა — SMS-ით გაცნობებთ.`} />
           <section className="card" style={{ gap: 14 }}>
             <div className="row between">
@@ -108,7 +108,7 @@ export default function ReservationPage() {
 
       {r.status === 'Waitlisted' && (
         <>
-          <Headline icon="#" bg="#E9E3FF" fg="#3A22A3" title={`მოლოდინის სიაში ხარ — №${r.waitlistPosition}`}
+          <Headline icon="#" bg="var(--violet-soft)" fg="var(--violet-ink)" title={`მოლოდინის სიაში ხარ — №${r.waitlistPosition}`}
             text="მარაგი ამჟამად სავსეა. თუ ვინმე გააუქმებს ან არ გაიტანს, ადგილი შენ გადმოგეცემა და SMS-ს მიიღებ." />
           <div className="row" style={{ justifyContent: 'center' }}>
             <Link to={`/d/${deal.slug}`} className="btn btn-soft">შეთავაზების ნახვა</Link>
@@ -118,19 +118,19 @@ export default function ReservationPage() {
       )}
 
       {r.status === 'Cancelled' && (
-        <Headline icon="×" bg="#FFD9EA" fg="#7A1A4B"
+        <Headline icon="×" bg="var(--pink)" fg="var(--pink-ink)"
           title={deal.status === 'Failed' ? 'ჯგუფი ვერ შეგროვდა' : 'ჯავშანი გაუქმებულია'}
           text={deal.status === 'Failed' ? 'ვადაში საკმარისი ადამიანი ვერ შეგროვდა. არაფერი გადაგიხდია.' : 'ჯავშანი გაუქმდა. არაფერი გადაგიხდია.'} />
       )}
 
       {r.status === 'Expired' && (
-        <Headline icon="!" bg="#FFE2D2" fg="#9A3F14" title="გატანის ვადა გავიდა"
+        <Headline icon="!" bg="var(--peach)" fg="var(--peach-ink)" title="გატანის ვადა გავიდა"
           text={`კოდი ${when(r.pickupDeadline)}-მდე მოქმედებდა. ადგილი მოლოდინის სიაში მყოფს გადაეცა.`} />
       )}
 
       {r.status === 'Redeemed' && (
         <>
-          <Headline icon={<CheckIcon />} bg="#CFF3E4" fg="#0E6B4B" title="ნივთი გატანილია"
+          <Headline icon={<CheckIcon />} bg="var(--mint)" fg="var(--mint-ink)" title="ნივთი გატანილია"
             text={`${deal.productName} · ${money(deal.groupPrice)} · ${when(r.redeemedAt)}`} />
           <section className="card center" style={{ gap: 12 }}>
             {r.buyerConfirmedPickup == null ? (
@@ -150,9 +150,9 @@ export default function ReservationPage() {
 
       <ErrorBox error={error} />
 
-      <div className="cta-band tone-butter" style={{ padding: '18px 22px', color: '#4A3600' }}>
+      <div className="cta-band tone-butter" style={{ padding: '18px 22px', color: 'var(--butter-ink)' }}>
         <span style={{ fontSize: 15, fontWeight: 600 }}>მოგეწონა? ნახე სხვა ნივთები, რომლებზეც ხალხი ფასს ითხოვს</span>
-        <Link to="/deals" className="btn-dark" style={{ background: '#fff', color: '#4A3600' }}>შეთავაზებების ნახვა</Link>
+        <Link to="/deals" className="btn-dark" style={{ background: 'var(--surface)', color: 'var(--butter-ink)' }}>შეთავაზებების ნახვა</Link>
       </div>
     </main>
   )
