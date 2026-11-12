@@ -53,3 +53,7 @@ Where the spec was ambiguous or the request changed it, we took the simplest opt
 - **`smsno=2` (informational)** for all messages. They are codes and deal updates the buyer asked for, not advertising.
 - **A failed SMS after a committed change is logged, not rolled back.** For example, a deal still activates even if one buyer's SMS fails; the code is always on the reservation page. Only the login code and the manual pickup-code resend report the failure to the user.
 - **The pickup-code resend is limited to 3 per reservation, 60 s apart,** and recorded in `NotificationLog` as `CodeResent`.
+
+## Real data
+- **Demo seed is off by default (`Seed:Demo`).** On every start only an admin account is ensured (`Seed:AdminEmail` / `Seed:AdminPassword`), so a wiped database is usable right away. Integration tests turn the demo on.
+- **Stores and products are switched off, not deleted** (`IsActive`), because deals, reservations and commissions reference them.

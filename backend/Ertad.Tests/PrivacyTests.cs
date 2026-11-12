@@ -14,6 +14,7 @@ public class PrivacyTests(PostgresFixture pg)
         {
             b.UseSetting("ConnectionStrings:Default", cs);
             b.UseSetting("Jobs:Enabled", "false");
+            b.UseSetting("Seed:Demo", "true");
         });
         var client = factory.CreateClient(); // app start runs migrations + demo seed (blender has 12 max prices)
 

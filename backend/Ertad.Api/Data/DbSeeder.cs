@@ -4,17 +4,32 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Ertad.Api.Data;
 
-/// <summary>Demo data for the Kutaisi pilot. Runs only when the database is empty.</summary>
+/// <summary>
+/// Startup data. Always: one admin account if none exists (Seed:AdminEmail / Seed:AdminPassword).
+/// Only with Seed:Demo = true and an empty database: the demo Kutaisi store, buyers and deals.
+/// </summary>
 public static class DbSeeder
 {
     public const string StoreEmail = "store@ertad.ge";
     public const string StorePassword = "Store123!";
-    public const string AdminEmail = "admin@ertad.ge";
-    public const string AdminPassword = "Admin123!";
 
-    public static async Task SeedAsync(AppDbContext db)
+    public static async Task SeedAsync(AppDbContext db, IConfiguration config)
     {
-        if (await db.Stores.AnyAsync()) return;
+        var hasher = new PasswordHasher<StaffUser>();
+        if (!await db.StaffUsers.AnyAsync(s => s.Role == StaffRole.Admin))
+        {
+            var admin = new StaffUser { Email = (config["Seed:AdminEmail"] ?? "admin@ertad.ge").Trim().ToLower(), Role = StaffRole.Admin };
+            admin.PasswordHash = hasher.HashPassword(admin, config["Seed:AdminPassword"] ?? "Admin123!");
+            db.StaffUsers.Add(admin);
+            await db.SaveChangesAsync();
+        }
+
+        if (config.GetValue("Seed:Demo", false) && !await db.Stores.AnyAsync())
+            await SeedDemoAsync(db, hasher);
+    }
+
+    private static async Task SeedDemoAsync(AppDbContext db, PasswordHasher<StaffUser> hasher)
+    {
         var now = DateTime.UtcNow;
 
         var store = new Store
@@ -41,12 +56,9 @@ public static class DbSeeder
             store.Products.Add(new StoreProduct { Name = name, Description = desc, RegularPrice = price });
         db.Stores.Add(store);
 
-        var hasher = new PasswordHasher<StaffUser>();
         var staff = new StaffUser { Email = StoreEmail, Role = StaffRole.StoreStaff, Store = store };
         staff.PasswordHash = hasher.HashPassword(staff, StorePassword);
-        var admin = new StaffUser { Email = AdminEmail, Role = StaffRole.Admin };
-        admin.PasswordHash = hasher.HashPassword(admin, AdminPassword);
-        db.StaffUsers.AddRange(staff, admin);
+        db.StaffUsers.Add(staff);
 
         // 30 demo buyers: +995 555 00 00 01 … 30
         var initials = "ნლგთმსაბდევზიკოპრტუფქღყშჩცძწჭხჯ";

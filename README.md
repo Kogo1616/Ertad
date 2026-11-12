@@ -33,15 +33,25 @@ Open http://localhost:5173.
 ### Single-process mode
 `npm run build` (in `frontend/`) writes the app into `backend/Ertad.Api/wwwroot`. After that, `dotnet run` alone serves the site at http://localhost:5080.
 
-## Demo logins
+## Logins
 
 | Who | How |
 | --- | --- |
-| Buyer | `/login`: any phone number, e.g. `599 11 22 33`. In Development the SMS code is shown on the page and printed in the API console. |
-| Store staff | `/staff/login`: `store@ertad.ge` / `Store123!` |
-| Admin | `/staff/login`: `admin@ertad.ge` / `Admin123!` → `/admin` |
+| Admin | `/staff/login`: `admin@ertad.ge` / `Admin123!` → `/admin`. It's created on first start; change it with `Seed:AdminEmail` / `Seed:AdminPassword` before the first start in production. |
+| Store staff | Accounts the admin creates on `/admin` → „თანამშრომლები“. |
+| Buyer | `/login`: any phone number. In Development (Dev SMS) the code is shown on the page and printed in the API console. |
 
-The seeded buyers are `+995 555 00 00 01` … `+995 555 00 00 30`. You can log in as any of them with OTP.
+## Adding real stores (admin UI)
+
+The database starts empty apart from the admin account.
+
+1. Log in at `/staff/login` as the admin. You land on `/admin`.
+2. **„მაღაზიები“:** fill in name, city, address, map link and commission per sold item, then press „შენახვა“.
+3. **„პროდუქტები“:** choose the store, enter name, description and regular price, and save. Then press „ატვირთვა“ in the product's row to upload a photo (jpg/png/webp, up to 5 MB).
+4. **„თანამშრომლები“:** create the store's login (email, password of at least 8 characters, role „მაღაზიის თანამშრომელი“, the store).
+5. The store logs in at `/staff/login` and publishes group deals from its panel (`/store`).
+
+Stores and products can't be deleted, only switched off: untick „აქტიური“ and save, so past deals and reports stay intact.
 
 ## Real SMS
 
@@ -86,13 +96,17 @@ Only Georgian numbers (+995) can receive SMS through sender.ge. When the real pr
 - **Login code:** the next one can be sent 60 s after the last, and at most 5 codes go out in about 10 minutes.
 - **Pickup code:** the buyer can have it re-sent from the reservation page, at most 3 times, 60 s apart. The code is always visible on that page anyway.
 
-## Seed data
+## Demo data (optional)
+
+Off by default. To load it, start the API on an **empty** database with `Seed:Demo=true` (PowerShell: `$env:Seed__Demo="true"`). It contains:
+- Store staff login `store@ertad.ge` / `Store123!`.
+- Buyers `+995 555 00 00 01` … `+995 555 00 00 30`.
 - One store, „[მაღაზია]“ in Kutaisi, with 12 household appliances.
 - 30 demo buyers. The blender has 18 interests; 12 of them give a price (3×≤50, 2×55, 7×60).
 - **Blender:** a FromRequests deal at 60 ₾, 7 / 10 reserved, stock 20 (`/d/blender-60`).
 - **Coffee machine:** a StoreInitiated deal at 210 ₾, min 6, stock 12, 2 reserved (`/d/coffee-210`).
 
-To reset: `dropdb -U postgres ertad`, then start the API again.
+To wipe everything: `dropdb -U postgres ertad`, then start the API again (it recreates the schema and the admin account).
 
 ## Tests
 
