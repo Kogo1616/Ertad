@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Ertad.Tests;
 
@@ -41,6 +42,21 @@ public class AdminTests(PostgresFixture pg)
         {
             email = "shop@example.ge", password = "Shop12345", role = "StoreStaff", storeId = store.Id,
         })).EnsureSuccessStatusCode();
+
+        // Photo upload: a real PNG is accepted, a renamed text file is not.
+        var productId = (await product.Content.ReadFromJsonAsync<Created>())!.Id;
+        byte[] png = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0, 0, 0, 0, 0, 0, 0, 0];
+        var good = new MultipartFormDataContent { { new ByteArrayContent(png), "file", "photo.png" } };
+        var up = await admin.PostAsync($"/api/admin/products/{productId}/image", good);
+        Assert.Equal(HttpStatusCode.OK, up.StatusCode);
+        var url = (await up.Content.ReadFromJsonAsync<Dictionary<string, string>>())!["imageUrl"];
+        Assert.Matches(@"^/uploads/p\d+-[0-9a-f]{32}\.png$", url);
+        Assert.Equal(HttpStatusCode.OK, (await admin.GetAsync(url)).StatusCode);
+        var env = factory.Services.GetRequiredService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>();
+        File.Delete(Path.Combine(env.ContentRootPath, "wwwroot", url.TrimStart('/'))); // don't leave test files in uploads/
+
+        var fake = new MultipartFormDataContent { { new ByteArrayContent("not an image"u8.ToArray()), "file", "evil.jpg" } };
+        Assert.Equal(HttpStatusCode.BadRequest, (await admin.PostAsync($"/api/admin/products/{productId}/image", fake)).StatusCode);
 
         // Public site shows the new store and product.
         var publicStore = await admin.GetFromJsonAsync<Dictionary<string, object>>($"/api/stores/{store.Id}");

@@ -15,6 +15,7 @@ export function SiteLayout() {
   }
   const buyer = me?.authenticated && me.role === 'Buyer'
   const staff = me?.authenticated && me.role !== 'Buyer'
+  const signOut = async () => { await logout(); nav('/deals') }
 
   return (
     <>
@@ -32,10 +33,9 @@ export function SiteLayout() {
           </form>
           <Link to="/my/reservations" className="header-link">ჩემი ჯავშნები</Link>
           <ThemeToggle />
-          {buyer && (
-            <button type="button" className="me-avatar" onClick={logout} title="გასვლა" aria-label={'გასვლა (' + me.phone + ')'}>{me.initial}</button>
-          )}
+          {buyer && <span className="me-avatar" title={me.phone} aria-label={'შესული ხარ: ' + me.phone}>{me.initial}</span>}
           {staff && <Link to={me.role === 'Admin' ? '/admin' : '/store'} className="btn-dark">პანელი</Link>}
+          {me?.authenticated && <button type="button" className="btn btn-ghost btn-sm" onClick={signOut}>გასვლა</button>}
           {!me?.authenticated && <Link to="/login" className="btn-dark">შესვლა</Link>}
         </div>
       </header>
@@ -48,6 +48,8 @@ export function SiteLayout() {
 export function StoreLayout() {
   const { me, logout } = useAuth()
   const loc = useLocation()
+  const nav = useNavigate()
+  const signOut = async () => { await logout(); nav('/deals') }
   if (me == null) return <Loading />
   if (!me.authenticated || me.role !== 'StoreStaff') return <Navigate to={'/staff/login?next=' + encodeURIComponent(loc.pathname)} replace />
 
@@ -63,7 +65,7 @@ export function StoreLayout() {
           <span style={{ fontSize: 13, fontWeight: 700 }}>{me.storeName}</span>
           <span className="muted" style={{ fontSize: 12 }}>{me.storeCity} · პილოტი</span>
         </div>
-        <button type="button" className="btn btn-white btn-sm" style={{ marginTop: 10 }} onClick={logout}>გასვლა</button>
+        <button type="button" className="btn btn-white btn-sm" style={{ marginTop: 10 }} onClick={signOut}>გასვლა</button>
         <ThemeToggle />
       </nav>
       <main className="panel-main">

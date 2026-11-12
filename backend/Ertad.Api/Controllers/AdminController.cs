@@ -82,18 +82,38 @@ public class AdminController(AppDbContext db, DealService deals, IWebHostEnviron
     {
         var p = await db.StoreProducts.FindAsync(id);
         if (p == null) return NotFound();
-        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-        if (ext is not (".jpg" or ".jpeg" or ".png" or ".webp")) return BadRequest(new { error = "მხოლოდ jpg, png ან webp" });
+        if (file.Length == 0) return BadRequest(new { error = "ფაილი ცარიელია" });
 
-        var name = $"p{id}-{Guid.NewGuid():N}{ext}";
+        // Trust the bytes, not the file name: the extension comes from the detected format.
+        var header = new byte[12];
+        await using (var s = file.OpenReadStream()) _ = await s.ReadAtLeastAsync(header, header.Length, throwOnEndOfStream: false);
+        var ext = DetectImage(header);
+        if (ext == null) return BadRequest(new { error = "მხოლოდ jpg, png ან webp ფოტო" });
+
         var dir = Path.Combine(env.ContentRootPath, "wwwroot", "uploads");
         Directory.CreateDirectory(dir);
+        var name = $"p{id}-{Guid.NewGuid():N}{ext}";
         await using (var stream = System.IO.File.Create(Path.Combine(dir, name)))
             await file.CopyToAsync(stream);
+
+        var old = p.ImageUrl;
         p.ImageUrl = $"/uploads/{name}";
         await db.SaveChangesAsync();
+
+        // Remove the replaced file (only ever our own files inside wwwroot/uploads).
+        if (old?.StartsWith("/uploads/") == true)
+        {
+            var oldPath = Path.GetFullPath(Path.Combine(dir, Path.GetFileName(old)));
+            if (oldPath.StartsWith(Path.GetFullPath(dir)) && System.IO.File.Exists(oldPath)) System.IO.File.Delete(oldPath);
+        }
         return Ok(new { p.ImageUrl });
     }
+
+    private static string? DetectImage(byte[] h) =>
+        h is [0xFF, 0xD8, 0xFF, ..] ? ".jpg"
+        : h is [0x89, 0x50, 0x4E, 0x47, ..] ? ".png"
+        : h is [(byte)'R', (byte)'I', (byte)'F', (byte)'F', _, _, _, _, (byte)'W', (byte)'E', (byte)'B', (byte)'P'] ? ".webp"
+        : null;
 
     // ---- staff
     [HttpGet("staff")]

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { api } from '../api'
 import { useAuth } from '../auth'
@@ -28,6 +28,53 @@ export default function AdminPage() {
   )
 }
 
+const MAX_IMAGE_BYTES = 5_000_000
+const IMAGE_TYPES = 'image/png,image/jpeg,image/webp'
+
+/** Photo picker with a preview of the chosen (or current) image. */
+function ImageInput({ id, file, currentUrl, onChange }) {
+  const [error, setError] = useState(null)
+  const [preview, setPreview] = useState(null)
+  useEffect(() => {
+    if (!file) { setPreview(null); return }
+    const url = URL.createObjectURL(file)
+    setPreview(url)
+    return () => URL.revokeObjectURL(url)
+  }, [file])
+
+  const pick = (e) => {
+    const f = e.target.files[0]
+    e.target.value = ''
+    if (!f) return
+    if (f.size > MAX_IMAGE_BYTES) { setError('ფაილი 5 MB-ზე დიდია'); return }
+    setError(null)
+    onChange(f)
+  }
+  const shown = preview ?? currentUrl
+  return (
+    <div className="stack-sm" style={{ gap: 8 }}>
+      <div className="row" style={{ gap: 12, flexWrap: 'nowrap' }}>
+        <div className="pimg" style={{ width: 72, height: 72, flex: 'none' }}>
+          {shown ? <img src={shown} alt="" /> : <span className="small muted">ფოტო</span>}
+        </div>
+        <span className="btn btn-soft btn-sm" style={{ cursor: 'pointer' }}>
+          {shown ? 'შეცვლა' : 'ფოტოს არჩევა'}
+          <input id={id} type="file" accept={IMAGE_TYPES} hidden onChange={pick} />
+        </span>
+        {file && <button type="button" className="btn btn-ghost btn-sm" onClick={() => onChange(null)}>გაუქმება</button>}
+      </div>
+      <span className="small muted" style={{ fontWeight: 500 }}>jpg, png ან webp, 5 MB-მდე</span>
+      {error && <span className="small" style={{ color: 'var(--danger)' }}>{error}</span>}
+    </div>
+  )
+}
+
+async function uploadImage(productId, file) {
+  const form = new FormData()
+  form.append('file', file)
+  return api(`/admin/products/${productId}/image`, { method: 'POST', form })
+}
+
 /** Generic inline form helper: fields = [[key, label, type]] */
 function SimpleForm({ fields, initial, onSubmit, submitLabel = 'შენახვა' }) {
   const [v, setV] = useState(initial)
@@ -46,6 +93,8 @@ function SimpleForm({ fields, initial, onSubmit, submitLabel = 'შენახ�
               <select id={'f-' + k} className="input" value={v[k] ?? ''} onChange={(e) => setV({ ...v, [k]: e.target.value })}>
                 {options.map(([val, text]) => <option key={val} value={val}>{text}</option>)}
               </select>
+            ) : type === 'image' ? (
+              <ImageInput id={'f-' + k} file={v[k]} currentUrl={v.imageUrl} onChange={(file) => setV({ ...v, [k]: file })} />
             ) : type === 'checkbox' ? (
               <input id={'f-' + k} type="checkbox" checked={!!v[k]} onChange={(e) => setV({ ...v, [k]: e.target.checked })} style={{ width: 22, height: 22 }} />
             ) : (
@@ -92,24 +141,28 @@ function Products() {
   const [products, error, reload] = useLoad(() => api('/admin/products'), [])
   const [stores] = useLoad(() => api('/admin/stores'), [])
   const [editing, setEditing] = useState(null)
+  const [rowError, setRowError] = useState(null)
   if (!stores) return <Loading />
+  if (stores.length === 0) return <div className="empty">ჯერ დაამატე მაღაზია „მაღაზიების“ ჩანართში</div>
   const fields = [
     ['storeId', 'მაღაზია', 'select', stores.map((s) => [s.id, s.name])],
     ['name', 'სახელი'], ['description', 'აღწერა'], ['regularPrice', 'ფასი, ₾', 'number'], ['isActive', 'აქტიური', 'checkbox'],
+    ['photo', 'ფოტო', 'image'],
   ]
-  const save = async (v) => {
+  const save = async ({ photo, ...v }) => {
     const body = { ...v, storeId: Number(v.storeId), regularPrice: Number(v.regularPrice) }
-    await api(editing ? `/admin/products/${editing.id}` : '/admin/products', { method: editing ? 'PUT' : 'POST', body })
+    const saved = await api(editing ? `/admin/products/${editing.id}` : '/admin/products', { method: editing ? 'PUT' : 'POST', body })
+    if (photo) await uploadImage(saved.id, photo)
     setEditing(null); reload()
   }
   const upload = async (id, file) => {
-    const form = new FormData()
-    form.append('file', file)
-    try { await api(`/admin/products/${id}/image`, { method: 'POST', form }); reload() } catch (e) { alert(e.message) }
+    setRowError(null)
+    if (file.size > MAX_IMAGE_BYTES) { setRowError('ფაილი 5 MB-ზე დიდია'); return }
+    try { await uploadImage(id, file); reload() } catch (e) { setRowError(e.message) }
   }
   return (
     <section className="stack">
-      <ErrorBox error={error} />
+      <ErrorBox error={error ?? rowError} />
       <div className="card table-wrap">
         <table>
           <thead><tr><th>#</th><th>ფოტო</th><th>სახელი</th><th>ფასი</th><th>აქტიური</th><th></th></tr></thead>
@@ -117,10 +170,15 @@ function Products() {
             <tr key={p.id}>
               <td>{p.id}</td>
               <td>
-                {p.imageUrl && <img src={p.imageUrl} alt="" width="48" height="48" style={{ objectFit: 'cover', borderRadius: 10, display: 'block', marginBottom: 4 }} />}
-                <label className="small" style={{ cursor: 'pointer', color: 'var(--accent-ink)', fontWeight: 700 }}>
-                  ატვირთვა<input type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={(e) => e.target.files[0] && upload(p.id, e.target.files[0])} />
-                </label>
+                <div className="row" style={{ gap: 8, flexWrap: 'nowrap' }}>
+                  <div className="pimg" style={{ width: 48, height: 48, flex: 'none' }}>
+                    {p.imageUrl ? <img src={p.imageUrl} alt="" /> : <span className="small muted">—</span>}
+                  </div>
+                  <label className="btn btn-soft btn-sm" style={{ cursor: 'pointer' }}>
+                    {p.imageUrl ? 'შეცვლა' : 'ატვირთვა'}
+                    <input type="file" accept={IMAGE_TYPES} hidden onChange={(e) => { const f = e.target.files[0]; e.target.value = ''; if (f) upload(p.id, f) }} />
+                  </label>
+                </div>
               </td>
               <td>{p.name}<div className="small muted">{p.description}</div></td>
               <td>{money(p.regularPrice)}</td><td>{p.isActive ? 'დიახ' : 'არა'}</td>
