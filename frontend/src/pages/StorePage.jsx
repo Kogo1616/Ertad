@@ -5,7 +5,7 @@ import { money } from '../format'
 
 export function ProductGrid({ products }) {
   return (
-    <div className="grid-auto">
+    <div className="grid-items">
       {products.map((p) => (
         <Link key={p.id} to={`/stores/${p.storeId}/products/${p.id}`} className="product-card">
           <ProductImage name={p.name} imageUrl={p.imageUrl} height={140} radius={18}>

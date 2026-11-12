@@ -23,7 +23,7 @@ export default function StoresPage() {
         {q ? <h2>მაღაზიები</h2> : <h1>მაღაზიები</h1>}
         <ErrorBox error={error} />
         {!stores && !error && <Loading />}
-        <div className="grid-auto">
+        <div className="grid-items">
           {stores?.map((s, i) => {
             const [bg, fg] = ['var(--accent-soft)', 'var(--accent-ink)']
             return (

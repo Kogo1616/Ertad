@@ -77,6 +77,8 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 .stack-sm { display: flex; flex-direction: column; gap: 6px; }
 .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
 .grid-auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+/* Catalog lists (stores, products): cards keep their width and fill the row left to right, even with 1–2 items. */
+.grid-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
 .split { display: flex; flex-wrap: wrap; gap: 20px; align-items: stretch; }
 .split > * { min-width: 0; }
 .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
