@@ -52,8 +52,14 @@ public class PublicController(AppDbContext db, DealService deals) : ControllerBa
         {
             p.Id, p.Name, p.Description, p.ImageUrl, p.RegularPrice, p.StoreId, storeName = p.Store.Name, storeCity = p.Store.City,
             interestCount = db.DiscountInterests.Count(i => i.StoreProductId == p.Id && i.Status == InterestStatus.Active),
-            dealSlug = db.Deals.Where(d => d.StoreProductId == p.Id && Live.Contains(d.Status)).Select(d => d.PublicSlug).FirstOrDefault(),
-            dealPrice = db.Deals.Where(d => d.StoreProductId == p.Id && Live.Contains(d.Status)).Select(d => (decimal?)d.GroupPrice).FirstOrDefault(),
+            // The product's live group deal, if any: enough for a "before / after" price on the card.
+            deal = db.Deals.Where(d => d.StoreProductId == p.Id && Live.Contains(d.Status))
+                .Select(d => new
+                {
+                    slug = d.PublicSlug, d.Status, d.GroupPrice, regularPrice = d.RegularPriceSnapshot,
+                    confirmed = d.ConfirmedCount, min = d.MinReservations, d.MaxStock, deadline = d.ReservationDeadline,
+                })
+                .FirstOrDefault(),
         }).ToListAsync();
         return rows.Cast<object>().ToList();
     }

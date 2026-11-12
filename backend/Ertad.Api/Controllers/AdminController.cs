@@ -69,8 +69,33 @@ public class AdminController(AppDbContext db, DealService deals, IWebHostEnviron
     public async Task<IActionResult> Products([FromQuery] int? storeId) =>
         Ok(await db.StoreProducts.AsNoTracking().Where(p => storeId == null || p.StoreId == storeId)
             .OrderBy(p => p.StoreId).ThenBy(p => p.Id)
-            .Select(p => new { p.Id, p.StoreId, p.Name, p.Description, p.RegularPrice, p.ImageUrl, p.IsActive })
+            .Select(p => new
+            {
+                p.Id, p.StoreId, p.Name, p.Description, p.RegularPrice, p.ImageUrl, p.IsActive,
+                liveDeal = db.Deals.Where(d => d.StoreProductId == p.Id && (d.Status == DealStatus.Open || d.Status == DealStatus.Activated))
+                    .Select(d => new { d.Id, slug = d.PublicSlug, d.Status, d.GroupPrice, confirmed = d.ConfirmedCount, min = d.MinReservations, d.MaxStock, deadline = d.ReservationDeadline })
+                    .FirstOrDefault(),
+            })
             .ToListAsync());
+
+    public record ProductDealInput(decimal GroupPrice, int MinReservations, int MaxStock, int DurationDays, int PickupDays, string? WarrantyTerms);
+
+    /// <summary>Publishes a store-initiated group deal on a product straight from the admin form.</summary>
+    [HttpPost("products/{id:int}/deal")]
+    public async Task<IActionResult> CreateProductDeal(int id, ProductDealInput i)
+    {
+        var p = await db.StoreProducts.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+        if (p == null) return NotFound();
+        if (i.DurationDays is < 1 or > 60) return BadRequest(new { error = "ვადა 1-დან 60 დღემდე" });
+        if (await db.Deals.AnyAsync(d => d.StoreProductId == id && (d.Status == DealStatus.Open || d.Status == DealStatus.Activated)))
+            return BadRequest(new { error = "ამ პროდუქტზე უკვე არის აქტიური შეთავაზება" });
+
+        var (deal, error) = await deals.CreateAsync(p.StoreId, new NewDealInput(
+            id, DealOrigin.StoreInitiated, i.GroupPrice, i.MinReservations, i.MaxStock,
+            DateTime.UtcNow.AddDays(i.DurationDays), i.PickupDays, i.WarrantyTerms, Publish: true));
+        if (deal == null || error != null) return BadRequest(new { error });
+        return Ok(new { deal.Id, slug = deal.PublicSlug });
+    }
 
     [HttpPost("products")]
     public async Task<IActionResult> CreateProduct(ProductInput i)

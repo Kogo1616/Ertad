@@ -32,6 +32,8 @@ public class DealService(AppDbContext db, Notifier notifier, IConfiguration conf
         var product = await db.StoreProducts.FirstOrDefaultAsync(p => p.Id == input.StoreProductId && p.StoreId == storeId);
         if (product == null) return (null, "პროდუქტი ვერ მოიძებნა");
         if (input.GroupPrice <= 0) return (null, "ფასი უნდა იყოს 0-ზე მეტი");
+        if (input.GroupPrice >= product.RegularPrice)
+            return (null, $"ჯგუფური ფასი ჩვეულებრივ ფასზე ({Format.Money(product.RegularPrice)}) ნაკლები უნდა იყოს");
         if (input.MinReservations < 1) return (null, "მინიმალური ჯავშანი უნდა იყოს მინიმუმ 1");
         if (input.MaxStock < input.MinReservations) return (null, "მარაგი არ უნდა იყოს მინიმალურ ჯგუფზე ნაკლები");
         if (input.PickupDays < 1) return (null, "გატანის ვადა მინიმუმ 1 დღე");

@@ -25,6 +25,34 @@ public class AdminTests(PostgresFixture pg)
     }
 
     [Fact]
+    public async Task Admin_can_publish_a_group_deal_from_the_product_form()
+    {
+        var (factory, admin, _) = await AdminClientAsync();
+        await using var _f = factory;
+        var store = await (await admin.PostAsJsonAsync("/api/admin/stores", new { name = "მაღაზია", commissionPerItem = 5, isActive = true })).Content.ReadFromJsonAsync<Created>();
+        var product = await (await admin.PostAsJsonAsync("/api/admin/products", new { storeId = store!.Id, name = "ბლენდერი", regularPrice = 80, isActive = true })).Content.ReadFromJsonAsync<Created>();
+
+        // Group price must be below the regular price.
+        var tooHigh = await admin.PostAsJsonAsync($"/api/admin/products/{product!.Id}/deal", new { groupPrice = 80, minReservations = 10, maxStock = 20, durationDays = 7, pickupDays = 3 });
+        Assert.Equal(HttpStatusCode.BadRequest, tooHigh.StatusCode);
+
+        var ok = await admin.PostAsJsonAsync($"/api/admin/products/{product.Id}/deal", new { groupPrice = 60, minReservations = 10, maxStock = 20, durationDays = 7, pickupDays = 3, warrantyTerms = "1 წელი" });
+        Assert.Equal(HttpStatusCode.OK, ok.StatusCode);
+
+        // Only one live deal per product.
+        var second = await admin.PostAsJsonAsync($"/api/admin/products/{product.Id}/deal", new { groupPrice = 55, minReservations = 5, maxStock = 10, durationDays = 3, pickupDays = 3 });
+        Assert.Equal(HttpStatusCode.BadRequest, second.StatusCode);
+
+        // The public catalog and the deals list show the before/after price.
+        var catalog = await admin.GetStringAsync($"/api/stores/{store.Id}");
+        Assert.Contains("\"groupPrice\":60", catalog);
+        Assert.Contains("\"regularPrice\":80", catalog);
+        Assert.Contains("\"min\":10", catalog);
+        Assert.Contains("ბლენდერი", await admin.GetStringAsync("/api/deals"));
+        Assert.Contains("\"liveDeal\":{", await admin.GetStringAsync("/api/admin/products"));
+    }
+
+    [Fact]
     public async Task Names_and_price_are_required()
     {
         var (factory, admin, _) = await AdminClientAsync();

@@ -4,7 +4,7 @@ import { api } from '../api'
 import { useAuth } from '../auth'
 import { ErrorBox, Loading, StatusChip, useLoad } from '../components/ui'
 import { useConfirm } from '../components/ConfirmDialog'
-import { DEAL_STATUS, dateTime, money } from '../format'
+import { DEAL_STATUS, dateTime, money, timeLeft, when } from '../format'
 
 const TABS = [['stores', 'მაღაზიები'], ['products', 'პროდუქტები'], ['staff', 'თანამშრომლები'], ['deals', 'შეთავაზებები'], ['log', 'შეტყობინებები']]
 
@@ -95,7 +95,7 @@ function RowImage({ imageUrl, onFile }) {
 }
 
 /** Generic inline form helper: fields = [[key, label, type, options]]; `required` = keys that must be filled. */
-function SimpleForm({ fields, initial, onSubmit, submitLabel = 'შენახვა', required = [] }) {
+function SimpleForm({ fields, initial, onSubmit, submitLabel = 'შენახვა', required = [], children }) {
   const [v, setV] = useState(initial)
   const [error, setError] = useState(null)
   const [busy, setBusy] = useState(false)
@@ -131,6 +131,7 @@ function SimpleForm({ fields, initial, onSubmit, submitLabel = 'შენახ�
           </label>
         ))}
       </div>
+      {typeof children === 'function' ? children(v) : children}
       <ErrorBox error={error} />
       <div className="row" style={{ gap: 12 }}>
         <button className="btn" disabled={busy}>{submitLabel}</button>
@@ -175,24 +176,122 @@ function Stores() {
   )
 }
 
+const EMPTY_DEAL = { enabled: false, groupPrice: '', minReservations: '10', maxStock: '20', durationDays: '7', pickupDays: '3', warrantyTerms: '' }
+
+/** Problem with the group-deal fields, or null. Checked before anything is saved. */
+function dealError(deal, regularPrice) {
+  if (!deal.enabled) return null
+  const price = Number(deal.groupPrice), min = Number(deal.minReservations), stock = Number(deal.maxStock), days = Number(deal.durationDays)
+  if (!(price > 0)) return 'შეავსე ჯგუფური ფასი'
+  if (regularPrice > 0 && price >= regularPrice) return `ჯგუფური ფასი ჩვეულებრივ ფასზე (${money(regularPrice)}) ნაკლები უნდა იყოს`
+  if (!(min >= 1)) return 'მიუთითე, რამდენი ადამიანი უნდა შეგროვდეს'
+  if (!(stock >= min)) return 'მარაგი არ უნდა იყოს ადამიანების რაოდენობაზე ნაკლები'
+  if (!(days >= 1 && days <= 60)) return 'ვადა 1-დან 60 დღემდე'
+  if (!(Number(deal.pickupDays) >= 1)) return 'გატანის ვადა მინიმუმ 1 დღე'
+  return null
+}
+
+/** "Sell at a group price" block inside the product form, with a live before/after preview. */
+function DealSection({ deal, setDeal, regularPrice, liveDeal }) {
+  if (liveDeal) {
+    return (
+      <div className="note" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <strong>აქტიური ჯგუფური შეთავაზება: {money(liveDeal.groupPrice)} · {liveDeal.confirmed} / {liveDeal.min} ჯავშანი</strong>
+        <span>ვადა: {when(liveDeal.deadline)} · <a href={`/d/${liveDeal.slug}`} target="_blank" rel="noreferrer">საჯარო გვერდი</a>. პირობები აღარ იცვლება; საჭიროების შემთხვევაში გააუქმე „შეთავაზებების“ ჩანართში.</span>
+      </div>
+    )
+  }
+  const set = (k) => (e) => setDeal({ ...deal, [k]: e.target.value })
+  const price = Number(deal.groupPrice)
+  const off = regularPrice > 0 && price > 0 && price < regularPrice ? Math.round(((regularPrice - price) / regularPrice) * 100) : null
+  const deadline = Number(deal.durationDays) > 0 ? new Date(Date.now() + Number(deal.durationDays) * 86400000).toISOString() : null
+  const req = <span style={{ color: 'var(--danger)' }} aria-label="სავალდებულო"> *</span>
+
+  return (
+    <fieldset className="deal-box">
+      <legend className="sr-only">ჯგუფური შეთავაზება</legend>
+      <label className="check-row" htmlFor="deal-enabled" style={{ height: 'auto' }}>
+        <input id="deal-enabled" type="checkbox" checked={deal.enabled} onChange={(e) => setDeal({ ...deal, enabled: e.target.checked })} />
+        <span>
+          <strong style={{ fontSize: 16 }}>ჯგუფური ფასით გაყიდვა</strong>
+          <span className="small muted" style={{ display: 'block', fontWeight: 500 }}>ფასი აქტიურდება, როცა ვადაში საკმარისი ადამიანი შეგროვდება</span>
+        </span>
+      </label>
+      {deal.enabled && (
+        <>
+          <div className="form-grid">
+            <label className="field" htmlFor="d-price"><span>ჯგუფური ფასი, ₾{req}</span>
+              <input id="d-price" className="input" type="number" min="0" step="any" value={deal.groupPrice} onChange={set('groupPrice')} /></label>
+            <label className="field" htmlFor="d-min"><span>რამდენი ადამიანი უნდა შეგროვდეს{req}</span>
+              <input id="d-min" className="input" type="number" min="1" value={deal.minReservations} onChange={set('minReservations')} /></label>
+            <label className="field" htmlFor="d-stock"><span>მარაგი, ცალი{req}</span>
+              <input id="d-stock" className="input" type="number" min="1" value={deal.maxStock} onChange={set('maxStock')} /></label>
+            <label className="field" htmlFor="d-days"><span>ვადა, დღე{req}</span>
+              <input id="d-days" className="input" type="number" min="1" max="60" value={deal.durationDays} onChange={set('durationDays')} /></label>
+            <label className="field" htmlFor="d-pickup"><span>გატანის ვადა, დღე{req}</span>
+              <input id="d-pickup" className="input" type="number" min="1" value={deal.pickupDays} onChange={set('pickupDays')} /></label>
+            <label className="field" htmlFor="d-warranty"><span>გარანტია</span>
+              <input id="d-warranty" className="input" placeholder="მაგ. 1 წელი" value={deal.warrantyTerms} onChange={set('warrantyTerms')} /></label>
+          </div>
+          {/* How buyers will see it */}
+          <div className="deal-preview" aria-live="polite">
+            <span className="small muted">ასე დაინახავენ მყიდველები</span>
+            <div className="row" style={{ alignItems: 'baseline', gap: 10 }}>
+              <span style={{ fontSize: 30, fontWeight: 800, color: 'var(--accent-ink)' }}>{price > 0 ? money(price) : '— ₾'}</span>
+              {regularPrice > 0 && <span className="strike" style={{ fontSize: 18 }}>{money(regularPrice)}</span>}
+              {off != null && <span className="chip" style={{ background: 'var(--accent)', color: 'var(--on-accent)' }}>−{off}% · დაზოგე {money(regularPrice - price)}</span>}
+            </div>
+            <span className="small">
+              აქტიურდება, თუ <strong>{deal.minReservations || '—'}</strong> ადამიანი შეგროვდება{deadline ? <> <strong>{when(deadline)}</strong>-მდე</> : ''}. მაქსიმუმ {deal.maxStock || '—'} ცალი.
+            </span>
+          </div>
+          <span className="small muted">გამოქვეყნების შემდეგ ფასი, რაოდენობა და ვადა აღარ იცვლება. ვინც ამ პროდუქტს ითხოვდა, SMS-ს მიიღებს.</span>
+        </>
+      )}
+    </fieldset>
+  )
+}
+
 function Products() {
   const confirm = useConfirm()
   const [products, error, reload] = useLoad(() => api('/admin/products'), [])
   const [stores] = useLoad(() => api('/admin/stores'), [])
   const [editing, setEditing] = useState(null)
   const [rowError, setRowError] = useState(null)
+  const [deal, setDeal] = useState(EMPTY_DEAL)
+  const [notice, setNotice] = useState(null)
   if (!stores) return <Loading />
   if (stores.length === 0) return <div className="empty">ჯერ დაამატე მაღაზია „მაღაზიების“ ჩანართში</div>
   const fields = [
     ['storeId', 'მაღაზია', 'select', stores.map((s) => [s.id, s.name])],
-    ['name', 'სახელი'], ['description', 'აღწერა'], ['regularPrice', 'ფასი, ₾', 'number'], ['isActive', 'აქტიური', 'checkbox'],
+    ['name', 'სახელი'], ['description', 'აღწერა'], ['regularPrice', 'ჩვეულებრივი ფასი, ₾', 'number'], ['isActive', 'აქტიური', 'checkbox'],
     ['photo', 'ფოტო', 'image'],
   ]
+  const startEdit = (p) => { setEditing(p); setDeal(EMPTY_DEAL); setNotice(null) }
   const save = async ({ photo, ...v }) => {
-    const body = { ...v, storeId: Number(v.storeId), regularPrice: Number(v.regularPrice) }
+    const regularPrice = Number(v.regularPrice)
+    const problem = editing?.liveDeal ? null : dealError(deal, regularPrice)
+    if (problem) throw new Error(problem)
+    setNotice(null)
+    const body = { ...v, storeId: Number(v.storeId), regularPrice }
     const saved = await api(editing ? `/admin/products/${editing.id}` : '/admin/products', { method: editing ? 'PUT' : 'POST', body })
     if (photo) await uploadImage('products', saved.id, photo)
-    setEditing(null); reload()
+    if (deal.enabled && !editing?.liveDeal) {
+      try {
+        const d = await api(`/admin/products/${saved.id}/deal`, {
+          method: 'POST',
+          body: {
+            groupPrice: Number(deal.groupPrice), minReservations: Number(deal.minReservations), maxStock: Number(deal.maxStock),
+            durationDays: Number(deal.durationDays), pickupDays: Number(deal.pickupDays), warrantyTerms: deal.warrantyTerms,
+          },
+        })
+        setNotice({ text: 'პროდუქტი შენახულია და ჯგუფური შეთავაზება გამოქვეყნდა.', slug: d.slug })
+      } catch (e) {
+        reload()
+        throw new Error(`პროდუქტი შენახულია, მაგრამ შეთავაზება ვერ გამოქვეყნდა: ${e.message}`)
+      }
+    }
+    setEditing(null); setDeal(EMPTY_DEAL); reload()
   }
   const upload = async (id, file) => {
     setRowError(null)
@@ -219,16 +318,22 @@ function Products() {
       <ErrorBox error={error ?? rowError} />
       <div className="card table-wrap">
         <table>
-          <thead><tr><th>#</th><th>ფოტო</th><th>სახელი</th><th>ფასი</th><th>აქტიური</th><th></th></tr></thead>
+          <thead><tr><th>#</th><th>ფოტო</th><th>სახელი</th><th>ფასი</th><th>ჯგუფური</th><th>აქტიური</th><th></th></tr></thead>
           <tbody>{products?.map((p) => (
             <tr key={p.id}>
               <td>{p.id}</td>
               <td><RowImage imageUrl={p.imageUrl} onFile={(f) => upload(p.id, f)} /></td>
               <td>{p.name}<div className="small muted">{p.description}</div></td>
-              <td>{money(p.regularPrice)}</td><td>{p.isActive ? 'დიახ' : 'არა'}</td>
+              <td>{money(p.regularPrice)}</td>
+              <td>
+                {p.liveDeal
+                  ? <><strong style={{ color: 'var(--accent-ink)' }}>{money(p.liveDeal.groupPrice)}</strong><div className="small muted">{p.liveDeal.confirmed} / {p.liveDeal.min} · {timeLeft(p.liveDeal.deadline)}</div></>
+                  : <span className="muted">—</span>}
+              </td>
+              <td>{p.isActive ? 'დიახ' : 'არა'}</td>
               <td>
                 <div className="row" style={{ gap: 8, flexWrap: 'nowrap' }}>
-                  <button type="button" className="btn btn-sm btn-soft" onClick={() => setEditing(p)}>რედაქტირება</button>
+                  <button type="button" className="btn btn-sm btn-soft" onClick={() => startEdit(p)}>რედაქტირება</button>
                   <button type="button" className="btn btn-sm btn-ghost" style={{ color: 'var(--danger)' }} onClick={() => remove(p)} aria-label={`წაშლა: ${p.name}`}>წაშლა</button>
                 </div>
               </td>
@@ -237,8 +342,11 @@ function Products() {
         </table>
       </div>
       <h2>{editing ? `რედაქტირება: ${editing.name}` : 'ახალი პროდუქტი'}</h2>
+      {notice && <div className="note" role="status">{notice.text} {notice.slug && <a href={`/d/${notice.slug}`} target="_blank" rel="noreferrer">საჯარო გვერდი</a>}</div>}
       <SimpleForm key={editing?.id ?? 'new'} fields={fields} onSubmit={save} required={['name', 'regularPrice']}
-        initial={editing ?? { storeId: stores[0]?.id, name: '', description: '', regularPrice: '', isActive: true }} />
+        initial={editing ?? { storeId: stores[0]?.id, name: '', description: '', regularPrice: '', isActive: true }}>
+        {(v) => <DealSection deal={deal} setDeal={setDeal} regularPrice={Number(v.regularPrice)} liveDeal={editing?.liveDeal} />}
+      </SimpleForm>
     </section>
   )
 }

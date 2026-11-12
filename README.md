@@ -47,7 +47,7 @@ The database starts empty apart from the admin account.
 
 1. Log in at `/staff/login` as the admin. You land on `/admin`.
 2. **„მაღაზიები“:** fill in name, city, address, map link and commission per sold item, then press „შენახვა“.
-3. **„პროდუქტები“:** choose the store, enter name, description and regular price, and save. Then press „ატვირთვა“ in the product's row to upload a photo (jpg/png/webp, up to 5 MB).
+3. **„პროდუქტები“:** choose the store, enter name, description, regular price and an optional photo. To sell it at a group price right away, tick „ჯგუფური ფასით გაყიდვა“ and set the group price, how many people must join, stock, duration in days and pickup days. On save the deal is published and the card shows the group price next to the crossed-out regular price.
 4. **„თანამშრომლები“:** create the store's login (email, password of at least 8 characters, role „მაღაზიის თანამშრომელი“, the store).
 5. The store logs in at `/staff/login` and publishes group deals from its panel (`/store`).
 
