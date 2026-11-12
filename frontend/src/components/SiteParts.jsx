@@ -37,7 +37,8 @@ export function SiteFooter() {
       <div className="site-footer-inner">
         <div className="stack-sm" style={{ maxWidth: 320 }}>
           <Logo to="/" />
-          <p className="small muted">ჯგუფური შესყიდვები: ერთად ვაგროვებთ მყიდველებს, მაღაზია ჯგუფურ ფასს გვაძლევს. წინასწარ არაფერს ვიხდით.</p>
+          <strong style={{ fontSize: 16 }}>ერთად უფრო იაფია.</strong>
+          <p className="small muted">გაერთიანდი სხვებთან და მიიღე უკეთესი შეთავაზება.</p>
         </div>
         <nav aria-label="მყიდველებისთვის" className="footer-col">
           <strong>მყიდველებისთვის</strong>

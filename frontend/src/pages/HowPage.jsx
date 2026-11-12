@@ -6,8 +6,8 @@ export default function HowPage() {
   return (
     <main className="page">
       <div className="stack-sm">
-        <h1>ერთად იაფია</h1>
-        <p className="muted">როცა ბევრს გვინდა ერთი და იგივე ნივთი, მაღაზია ჯგუფს სპეციალურ ფასს სთავაზობს.</p>
+        <h1>ერთად უფრო იაფია.</h1>
+        <p className="muted">გაერთიანდი სხვებთან და მიიღე უკეთესი შეთავაზება. როცა ბევრს გვინდა ერთი და იგივე ნივთი, მაღაზია ჯგუფს სპეციალურ ფასს სთავაზობს.</p>
       </div>
       <HowItWorks />
       <div className="grid-auto">

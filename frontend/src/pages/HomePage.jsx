@@ -58,9 +58,12 @@ export default function HomePage() {
       <section className="home-hero">
         <div className="stack" style={{ gap: 20, flex: '1 1 440px', minWidth: 0 }}>
           <span className="eyebrow" style={{ color: 'var(--accent-ink)' }}>ჯგუფური შესყიდვები</span>
-          <h1 className="home-title">ერთად იყიდე —<br /><span style={{ color: 'var(--accent-ink)' }}>იაფად</span></h1>
-          <p className="muted" style={{ fontSize: 18, maxWidth: 520 }}>
-            შეუერთდი სხვა მყიდველებს. როცა ჯგუფი შეივსება, მაღაზია ჯგუფურ ფასს გაძლევს. წინასწარ არაფერს იხდი — გადახდა მხოლოდ მაღაზიაში.
+          <h1 className="home-title">ერთად<br /><span style={{ color: 'var(--accent-ink)' }}>უფრო იაფია.</span></h1>
+          <p style={{ fontSize: 22, fontWeight: 600, maxWidth: 520, lineHeight: 1.4 }}>
+            გაერთიანდი სხვებთან და მიიღე უკეთესი შეთავაზება.
+          </p>
+          <p className="muted" style={{ fontSize: 16, maxWidth: 520 }}>
+            როცა ჯგუფი შეივსება, მაღაზია ჯგუფურ ფასს გაძლევს. წინასწარ არაფერს იხდი — გადახდა მხოლოდ მაღაზიაში.
           </p>
           <div className="row" style={{ gap: 12 }}>
             <Link to="/deals" className="btn btn-lg">აქტიური შეთავაზებები</Link>
