@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../api'
-import { isBuyer, useAuth } from '../auth'
-import { AvatarStack, CopyButton, DealCard, ErrorBox, HowItWorks, Loading, LockIcon, ProductImage, StoreLogo, useLoad } from '../components/ui'
+import { isBuyer, isStaff, staffRoleName, useAuth } from '../auth'
+import { AvatarStack, CopyButton, DealCard, ErrorBox, HowItWorks, Loading, LockIcon, ProductImage, StaffBuyerNote, StoreLogo, useLoad } from '../components/ui'
 import { money } from '../format'
 import { ProductGrid } from './StorePage'
 
@@ -115,8 +115,9 @@ export default function ProductPage() {
               <ErrorBox error={error} />
               {msg && <div className="note" role="status">{msg}</div>}
 
+              {isStaff(me) && <StaffBuyerNote roleName={staffRoleName(me)} />}
               <div className="row">
-                <button type="button" className="btn btn-lg" style={{ flex: '1 1 240px' }} disabled={busy} onClick={submit}>
+                <button type="button" className="btn btn-lg" style={{ flex: '1 1 240px' }} disabled={busy || isStaff(me)} onClick={submit}>
                   {p.myInterest ? 'ფასის განახლება' : 'მოითხოვე ჯგუფური ფასი'}
                 </button>
                 <CopyButton text={shareUrl} label="ბმულის კოპირება" className="btn btn-lg btn-soft" style={{ flex: '0 1 180px', fontSize: 15 }} />

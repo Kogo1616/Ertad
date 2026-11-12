@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { useAuth } from '../auth'
-import { Loading, Logo, SearchIcon } from './ui'
+import { isStaff, staffRoleName, useAuth } from '../auth'
+import { Loading, Logo, SearchIcon, StaffBuyerNote } from './ui'
 import ThemeToggle from './ThemeToggle'
 
 /** Round icon button, same size and style as the theme toggle. */
@@ -44,12 +44,12 @@ export function SiteLayout() {
           </form>
           {/* Right-hand actions stay together on one line; on narrow screens the whole group wraps. */}
           <div className="header-actions">
-            <Link to="/my/reservations" className="header-link" aria-label="ჩემი ჯავშნები">
+            {!staff && <Link to="/my/reservations" className="header-link" aria-label="ჩემი ჯავშნები">
               <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 8a2 2 0 0 0 2-2V5h14v1a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2v1H5v-1a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z" /><path d="M10 9h4M10 15h4" />
               </svg>
               <span className="label">ჩემი ჯავშნები</span>
-            </Link>
+            </Link>}
             <ThemeToggle />
             {buyer && <span className="me-avatar" title={me.phone} aria-label={'შესული ხარ: ' + me.phone}>{me.initial}</span>}
             {staff && <Link to={me.role === 'Admin' ? '/admin' : '/store'} className="btn-dark">პანელი</Link>}
@@ -98,6 +98,8 @@ export function RequireBuyer({ children }) {
   const { me } = useAuth()
   const loc = useLocation()
   if (me == null) return <Loading />
-  if (!me.authenticated || me.role !== 'Buyer') return <Navigate to={'/login?next=' + encodeURIComponent(loc.pathname + loc.search)} replace />
+  // Staff stay logged in as staff: explain instead of bouncing them to the buyer login.
+  if (isStaff(me)) return <main className="page" style={{ maxWidth: 640 }}><StaffBuyerNote roleName={staffRoleName(me)} /></main>
+  if (!me.authenticated) return <Navigate to={'/login?next=' + encodeURIComponent(loc.pathname + loc.search)} replace />
   return children
 }

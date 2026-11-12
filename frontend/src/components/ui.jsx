@@ -21,6 +21,16 @@ export function ProductImage({ name, imageUrl, height = 170, radius, children })
   )
 }
 
+/** Shown instead of buyer actions (reserve, request a price) when an admin or store account is logged in. */
+export function StaffBuyerNote({ roleName }) {
+  return (
+    <div className="note" role="note" style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <strong>ჯავშანი და ფასის მოთხოვნა მხოლოდ მყიდველებისთვისაა</strong>
+      <span className="small">შენ შესული ხარ როგორც {roleName}. დასაჯავშნად გამოდი სისტემიდან და შედი მყიდველის ანგარიშით (ტელეფონის ნომრით).</span>
+    </div>
+  )
+}
+
 /** Store photo/logo, or its first letter on a soft lime tile. */
 export function StoreLogo({ name, imageUrl, size = 48, round = false }) {
   const style = { width: size, height: size, flex: 'none', borderRadius: round ? '50%' : Math.round(size / 4), overflow: 'hidden' }

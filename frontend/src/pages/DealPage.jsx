@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
-import { isBuyer, useAuth } from '../auth'
-import { Countdown, CopyButton, ErrorBox, Loading, ProductImage, useLoad } from '../components/ui'
+import { isBuyer, isStaff, staffRoleName, useAuth } from '../auth'
+import { Countdown, CopyButton, ErrorBox, Loading, ProductImage, StaffBuyerNote, useLoad } from '../components/ui'
 import { money, when } from '../format'
 
 // How the buyer arrived here → reservation Source.
@@ -90,7 +90,12 @@ export default function DealPage() {
           </div>
 
           <ErrorBox error={error} />
-          {myReservation ? (
+          {isStaff(me) ? (
+            <>
+              <button type="button" className="btn btn-lg" disabled>შემოუერთდი {money(deal.groupPrice)}-ად</button>
+              <StaffBuyerNote roleName={staffRoleName(me)} />
+            </>
+          ) : myReservation ? (
             <button type="button" className="btn btn-lg" onClick={join}>ჩემი ჯავშანი →</button>
           ) : live ? (
             <button type="button" className="btn btn-lg" disabled={busy} onClick={join}>

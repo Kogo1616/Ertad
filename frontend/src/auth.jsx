@@ -17,3 +17,6 @@ export function AuthProvider({ children }) {
 
 export const useAuth = () => useContext(AuthContext)
 export const isBuyer = (me) => me?.authenticated && me.role === 'Buyer'
+/** Admin or store staff: they manage deals and must never reserve or request a price as a buyer. */
+export const isStaff = (me) => me?.authenticated && me.role !== 'Buyer'
+export const staffRoleName = (me) => (me?.role === 'Admin' ? 'ადმინისტრატორი' : 'მაღაზიის თანამშრომელი')

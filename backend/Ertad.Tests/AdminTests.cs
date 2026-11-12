@@ -39,6 +39,11 @@ public class AdminTests(PostgresFixture pg)
         var ok = await admin.PostAsJsonAsync($"/api/admin/products/{product.Id}/deal", new { groupPrice = 60, minReservations = 10, maxStock = 20, durationDays = 7, pickupDays = 3, warrantyTerms = "1 წელი" });
         Assert.Equal(HttpStatusCode.OK, ok.StatusCode);
 
+        // Staff can't act as buyers: reserving and requesting a price are buyer-only.
+        var slug = (await ok.Content.ReadFromJsonAsync<Dictionary<string, object>>())!["slug"].ToString();
+        Assert.Equal(HttpStatusCode.Forbidden, (await admin.PostAsJsonAsync($"/api/deals/{slug}/reserve", new { source = "StorePage" })).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await admin.PostAsJsonAsync($"/api/products/{product.Id}/interest", new { maxPrice = 50 })).StatusCode);
+
         // Only one live deal per product.
         var second = await admin.PostAsJsonAsync($"/api/admin/products/{product.Id}/deal", new { groupPrice = 55, minReservations = 5, maxStock = 10, durationDays = 3, pickupDays = 3 });
         Assert.Equal(HttpStatusCode.BadRequest, second.StatusCode);
