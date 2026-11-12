@@ -71,10 +71,26 @@ function ImageInput({ id, file, currentUrl, onChange }) {
   )
 }
 
-async function uploadImage(productId, file) {
+/** kind: 'products' | 'stores' */
+async function uploadImage(kind, id, file) {
   const form = new FormData()
   form.append('file', file)
-  return api(`/admin/products/${productId}/image`, { method: 'POST', form })
+  return api(`/admin/${kind}/${id}/image`, { method: 'POST', form })
+}
+
+/** Thumbnail + upload/replace button for a table row. */
+function RowImage({ imageUrl, onFile }) {
+  return (
+    <div className="row" style={{ gap: 8, flexWrap: 'nowrap' }}>
+      <div className="pimg" style={{ width: 48, height: 48, flex: 'none' }}>
+        {imageUrl ? <img src={imageUrl} alt="" /> : <span className="small muted">—</span>}
+      </div>
+      <label className="btn btn-soft btn-sm" style={{ cursor: 'pointer' }}>
+        {imageUrl ? 'შეცვლა' : 'ატვირთვა'}
+        <input type="file" accept={IMAGE_TYPES} hidden onChange={(e) => { const f = e.target.files[0]; e.target.value = ''; if (f) onFile(f) }} />
+      </label>
+    </div>
+  )
 }
 
 /** Generic inline form helper: fields = [[key, label, type]] */
@@ -117,20 +133,27 @@ function SimpleForm({ fields, initial, onSubmit, submitLabel = 'შენახ�
 function Stores() {
   const [stores, error, reload] = useLoad(() => api('/admin/stores'), [])
   const [editing, setEditing] = useState(null)
-  const fields = [['name', 'სახელი'], ['city', 'ქალაქი'], ['address', 'მისამართი'], ['mapUrl', 'რუკის ბმული'], ['commissionPerItem', 'საკომისიო / ერთეული, ₾', 'number'], ['isActive', 'აქტიური', 'checkbox']]
-  const save = async (v) => {
+  const [rowError, setRowError] = useState(null)
+  const fields = [['name', 'სახელი'], ['city', 'ქალაქი'], ['address', 'მისამართი'], ['mapUrl', 'რუკის ბმული'], ['commissionPerItem', 'საკომისიო / ერთეული, ₾', 'number'], ['isActive', 'აქტიური', 'checkbox'], ['photo', 'ფოტო ან ლოგო', 'image']]
+  const save = async ({ photo, ...v }) => {
     const body = { ...v, commissionPerItem: Number(v.commissionPerItem) }
-    await api(editing ? `/admin/stores/${editing.id}` : '/admin/stores', { method: editing ? 'PUT' : 'POST', body })
+    const saved = await api(editing ? `/admin/stores/${editing.id}` : '/admin/stores', { method: editing ? 'PUT' : 'POST', body })
+    if (photo) await uploadImage('stores', saved.id, photo)
     setEditing(null); reload()
+  }
+  const upload = async (id, file) => {
+    setRowError(null)
+    if (file.size > MAX_IMAGE_BYTES) { setRowError('ფაილი 5 MB-ზე დიდია'); return }
+    try { await uploadImage('stores', id, file); reload() } catch (e) { setRowError(e.message) }
   }
   return (
     <section className="stack">
-      <ErrorBox error={error} />
+      <ErrorBox error={error ?? rowError} />
       <div className="card table-wrap">
         <table>
-          <thead><tr><th>#</th><th>სახელი</th><th>ქალაქი</th><th>საკომისიო</th><th>აქტიური</th><th></th></tr></thead>
+          <thead><tr><th>#</th><th>ფოტო</th><th>სახელი</th><th>ქალაქი</th><th>საკომისიო</th><th>აქტიური</th><th></th></tr></thead>
           <tbody>{stores?.map((s) => (
-            <tr key={s.id}><td>{s.id}</td><td>{s.name}</td><td>{s.city}</td><td>{money(s.commissionPerItem)}</td><td>{s.isActive ? 'დიახ' : 'არა'}</td>
+            <tr key={s.id}><td>{s.id}</td><td><RowImage imageUrl={s.imageUrl} onFile={(f) => upload(s.id, f)} /></td><td>{s.name}</td><td>{s.city}</td><td>{money(s.commissionPerItem)}</td><td>{s.isActive ? 'დიახ' : 'არა'}</td>
               <td><button type="button" className="btn btn-sm btn-soft" onClick={() => setEditing(s)}>რედაქტირება</button></td></tr>
           ))}</tbody>
         </table>
@@ -157,13 +180,13 @@ function Products() {
   const save = async ({ photo, ...v }) => {
     const body = { ...v, storeId: Number(v.storeId), regularPrice: Number(v.regularPrice) }
     const saved = await api(editing ? `/admin/products/${editing.id}` : '/admin/products', { method: editing ? 'PUT' : 'POST', body })
-    if (photo) await uploadImage(saved.id, photo)
+    if (photo) await uploadImage('products', saved.id, photo)
     setEditing(null); reload()
   }
   const upload = async (id, file) => {
     setRowError(null)
     if (file.size > MAX_IMAGE_BYTES) { setRowError('ფაილი 5 MB-ზე დიდია'); return }
-    try { await uploadImage(id, file); reload() } catch (e) { setRowError(e.message) }
+    try { await uploadImage('products', id, file); reload() } catch (e) { setRowError(e.message) }
   }
   return (
     <section className="stack">
@@ -174,17 +197,7 @@ function Products() {
           <tbody>{products?.map((p) => (
             <tr key={p.id}>
               <td>{p.id}</td>
-              <td>
-                <div className="row" style={{ gap: 8, flexWrap: 'nowrap' }}>
-                  <div className="pimg" style={{ width: 48, height: 48, flex: 'none' }}>
-                    {p.imageUrl ? <img src={p.imageUrl} alt="" /> : <span className="small muted">—</span>}
-                  </div>
-                  <label className="btn btn-soft btn-sm" style={{ cursor: 'pointer' }}>
-                    {p.imageUrl ? 'შეცვლა' : 'ატვირთვა'}
-                    <input type="file" accept={IMAGE_TYPES} hidden onChange={(e) => { const f = e.target.files[0]; e.target.value = ''; if (f) upload(p.id, f) }} />
-                  </label>
-                </div>
-              </td>
+              <td><RowImage imageUrl={p.imageUrl} onFile={(f) => upload(p.id, f)} /></td>
               <td>{p.name}<div className="small muted">{p.description}</div></td>
               <td>{money(p.regularPrice)}</td><td>{p.isActive ? 'დიახ' : 'არა'}</td>
               <td><button type="button" className="btn btn-sm btn-soft" onClick={() => setEditing(p)}>რედაქტირება</button></td>

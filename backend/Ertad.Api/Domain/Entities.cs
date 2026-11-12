@@ -45,6 +45,7 @@ public class Store
     public string City { get; set; } = "";
     public string Address { get; set; } = "";
     public string MapUrl { get; set; } = "";
+    public string? ImageUrl { get; set; }
     public decimal CommissionPerItem { get; set; } = 5;
     public bool IsActive { get; set; } = true;
     public List<StoreProduct> Products { get; set; } = [];

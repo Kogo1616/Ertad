@@ -82,31 +82,52 @@ public class AdminController(AppDbContext db, DealService deals, IWebHostEnviron
     {
         var p = await db.StoreProducts.FindAsync(id);
         if (p == null) return NotFound();
-        if (file.Length == 0) return BadRequest(new { error = "ფაილი ცარიელია" });
+        var (url, error) = await SaveImageAsync(file, $"p{id}");
+        if (error != null) return BadRequest(new { error });
+        DeleteUpload(p.ImageUrl);
+        p.ImageUrl = url;
+        await db.SaveChangesAsync();
+        return Ok(new { p.ImageUrl });
+    }
 
-        // Trust the bytes, not the file name: the extension comes from the detected format.
+    [HttpPost("stores/{id:int}/image")]
+    [RequestSizeLimit(5_000_000)]
+    public async Task<IActionResult> UploadStoreImage(int id, IFormFile file)
+    {
+        var s = await db.Stores.FindAsync(id);
+        if (s == null) return NotFound();
+        var (url, error) = await SaveImageAsync(file, $"s{id}");
+        if (error != null) return BadRequest(new { error });
+        DeleteUpload(s.ImageUrl);
+        s.ImageUrl = url;
+        await db.SaveChangesAsync();
+        return Ok(new { s.ImageUrl });
+    }
+
+    private string UploadDir => Path.Combine(env.ContentRootPath, "wwwroot", "uploads");
+
+    /// <summary>Saves a jpg/png/webp to wwwroot/uploads. The format is detected from the bytes, not the file name.</summary>
+    private async Task<(string? Url, string? Error)> SaveImageAsync(IFormFile file, string prefix)
+    {
+        if (file.Length == 0) return (null, "ფაილი ცარიელია");
         var header = new byte[12];
         await using (var s = file.OpenReadStream()) _ = await s.ReadAtLeastAsync(header, header.Length, throwOnEndOfStream: false);
         var ext = DetectImage(header);
-        if (ext == null) return BadRequest(new { error = "მხოლოდ jpg, png ან webp ფოტო" });
+        if (ext == null) return (null, "მხოლოდ jpg, png ან webp ფოტო");
 
-        var dir = Path.Combine(env.ContentRootPath, "wwwroot", "uploads");
-        Directory.CreateDirectory(dir);
-        var name = $"p{id}-{Guid.NewGuid():N}{ext}";
-        await using (var stream = System.IO.File.Create(Path.Combine(dir, name)))
+        Directory.CreateDirectory(UploadDir);
+        var name = $"{prefix}-{Guid.NewGuid():N}{ext}";
+        await using (var stream = System.IO.File.Create(Path.Combine(UploadDir, name)))
             await file.CopyToAsync(stream);
+        return ($"/uploads/{name}", null);
+    }
 
-        var old = p.ImageUrl;
-        p.ImageUrl = $"/uploads/{name}";
-        await db.SaveChangesAsync();
-
-        // Remove the replaced file (only ever our own files inside wwwroot/uploads).
-        if (old?.StartsWith("/uploads/") == true)
-        {
-            var oldPath = Path.GetFullPath(Path.Combine(dir, Path.GetFileName(old)));
-            if (oldPath.StartsWith(Path.GetFullPath(dir)) && System.IO.File.Exists(oldPath)) System.IO.File.Delete(oldPath);
-        }
-        return Ok(new { p.ImageUrl });
+    /// <summary>Removes a replaced file — only ever our own files inside wwwroot/uploads.</summary>
+    private void DeleteUpload(string? url)
+    {
+        if (url?.StartsWith("/uploads/") != true) return;
+        var path = Path.GetFullPath(Path.Combine(UploadDir, Path.GetFileName(url)));
+        if (path.StartsWith(Path.GetFullPath(UploadDir)) && System.IO.File.Exists(path)) System.IO.File.Delete(path);
     }
 
     private static string? DetectImage(byte[] h) =>

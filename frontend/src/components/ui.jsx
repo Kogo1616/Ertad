@@ -21,6 +21,17 @@ export function ProductImage({ name, imageUrl, height = 170, radius, children })
   )
 }
 
+/** Store photo/logo, or its first letter on a soft lime tile. */
+export function StoreLogo({ name, imageUrl, size = 48, round = false }) {
+  const style = { width: size, height: size, flex: 'none', borderRadius: round ? '50%' : Math.round(size / 4), overflow: 'hidden' }
+  if (imageUrl) return <img src={imageUrl} alt="" style={{ ...style, objectFit: 'cover', display: 'block' }} />
+  return (
+    <span aria-hidden="true" style={{ ...style, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--accent-soft)', color: 'var(--accent-ink)', fontWeight: 800, fontSize: Math.round(size * 0.4) }}>
+      {name?.replace('[', '')[0]}
+    </span>
+  )
+}
+
 export function OriginBadge({ origin }) {
   return origin === 'FromRequests'
     ? <span className="chip pimg-badge badge-origin req">მყიდველების მოთხოვნით</span>

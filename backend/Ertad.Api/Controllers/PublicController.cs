@@ -22,7 +22,7 @@ public class PublicController(AppDbContext db, DealService deals) : ControllerBa
     [HttpGet("stores")]
     public async Task<IActionResult> Stores() =>
         Ok(await db.Stores.AsNoTracking().Where(s => s.IsActive)
-            .Select(s => new { s.Id, s.Name, s.City, s.Address, productCount = s.Products.Count(p => p.IsActive) })
+            .Select(s => new { s.Id, s.Name, s.City, s.Address, s.ImageUrl, productCount = s.Products.Count(p => p.IsActive) })
             .ToListAsync());
 
     [HttpGet("stores/{id:int}")]
@@ -31,7 +31,7 @@ public class PublicController(AppDbContext db, DealService deals) : ControllerBa
         var store = await db.Stores.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id && s.IsActive);
         if (store == null) return NotFound();
         var products = await ProductCards(db.StoreProducts.Where(p => p.StoreId == id && p.IsActive));
-        return Ok(new { store.Id, store.Name, store.City, store.Address, store.MapUrl, products });
+        return Ok(new { store.Id, store.Name, store.City, store.Address, store.MapUrl, store.ImageUrl, products });
     }
 
     [HttpGet("products")]
@@ -82,7 +82,7 @@ public class PublicController(AppDbContext db, DealService deals) : ControllerBa
         return Ok(new
         {
             p.Id, p.Name, p.Description, p.ImageUrl, p.RegularPrice,
-            store = new { p.Store.Id, p.Store.Name, p.Store.City },
+            store = new { p.Store.Id, p.Store.Name, p.Store.City, p.Store.ImageUrl },
             interestCount, initials, suggestedPrices = suggested,
             myInterest = mine == null ? null : new { mine.MaxPrice },
             deal = deal == null ? null : Dto.DealCard(deal),

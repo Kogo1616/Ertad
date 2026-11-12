@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../api'
 import { isBuyer, useAuth } from '../auth'
-import { AvatarStack, CopyButton, DealCard, ErrorBox, HowItWorks, Loading, LockIcon, ProductImage, useLoad } from '../components/ui'
+import { AvatarStack, CopyButton, DealCard, ErrorBox, HowItWorks, Loading, LockIcon, ProductImage, StoreLogo, useLoad } from '../components/ui'
 import { money } from '../format'
 import { ProductGrid } from './StorePage'
 
@@ -66,7 +66,7 @@ export default function ProductPage() {
 
         <div className="stack" style={{ flex: '1 1 400px', gap: 18 }}>
           <Link to={`/stores/${p.store.id}`} className="chip" style={{ alignSelf: 'flex-start', background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--ink)', padding: '4px 12px 4px 4px', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>
-            <span className="avatar" style={{ width: 26, height: 26, border: 0, background: 'var(--accent-soft)', color: 'var(--accent-ink)' }}>{p.store.name.replace('[', '')[0]}</span>
+            <StoreLogo name={p.store.name} imageUrl={p.store.imageUrl} size={26} round />
             {p.store.name} · {p.store.city}
           </Link>
           <div className="stack-sm" style={{ gap: 4 }}>

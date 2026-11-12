@@ -58,6 +58,17 @@ public class AdminTests(PostgresFixture pg)
         var fake = new MultipartFormDataContent { { new ByteArrayContent("not an image"u8.ToArray()), "file", "evil.jpg" } };
         Assert.Equal(HttpStatusCode.BadRequest, (await admin.PostAsync($"/api/admin/products/{productId}/image", fake)).StatusCode);
 
+        // Store photo: same rules, shown on the public store list.
+        var storeUp = await admin.PostAsync($"/api/admin/stores/{store.Id}/image",
+            new MultipartFormDataContent { { new ByteArrayContent(png), "file", "logo.png" } });
+        Assert.Equal(HttpStatusCode.OK, storeUp.StatusCode);
+        var storeUrl = (await storeUp.Content.ReadFromJsonAsync<Dictionary<string, string>>())!["imageUrl"];
+        Assert.Matches(@"^/uploads/s\d+-[0-9a-f]{32}\.png$", storeUrl);
+        Assert.Contains(storeUrl, await admin.GetStringAsync("/api/stores"));
+        File.Delete(Path.Combine(env.ContentRootPath, "wwwroot", storeUrl.TrimStart('/')));
+        Assert.Equal(HttpStatusCode.BadRequest, (await admin.PostAsync($"/api/admin/stores/{store.Id}/image",
+            new MultipartFormDataContent { { new ByteArrayContent("nope"u8.ToArray()), "file", "logo.png" } })).StatusCode);
+
         // Public site shows the new store and product.
         var publicStore = await admin.GetFromJsonAsync<Dictionary<string, object>>($"/api/stores/{store.Id}");
         Assert.Contains("ბლენდერი", publicStore!["products"].ToString());

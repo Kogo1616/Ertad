@@ -1,6 +1,6 @@
 import { Link, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
-import { ErrorBox, Loading, useLoad } from '../components/ui'
+import { ErrorBox, Loading, StoreLogo, useLoad } from '../components/ui'
 import { ProductGrid } from './StorePage'
 
 export default function StoresPage() {
@@ -24,17 +24,14 @@ export default function StoresPage() {
         <ErrorBox error={error} />
         {!stores && !error && <Loading />}
         <div className="grid-items">
-          {stores?.map((s, i) => {
-            const [bg, fg] = ['var(--accent-soft)', 'var(--accent-ink)']
-            return (
-              <Link key={s.id} to={`/stores/${s.id}`} className="product-card" style={{ padding: 20 }}>
-                <span className="icon-square" style={{ background: bg, color: fg }}>{s.name.replace('[', '')[0]}</span>
-                <span style={{ fontSize: 17, fontWeight: 800 }}>{s.name}</span>
-                <span className="small muted">{s.city} · {s.address}</span>
-                <span className="small" style={{ color: 'var(--accent-ink)', fontWeight: 700 }}>{s.productCount} პროდუქტი</span>
-              </Link>
-            )
-          })}
+          {stores?.map((s) => (
+            <Link key={s.id} to={`/stores/${s.id}`} className="product-card" style={{ padding: 20 }}>
+              <StoreLogo name={s.name} imageUrl={s.imageUrl} size={64} />
+              <span style={{ fontSize: 17, fontWeight: 800 }}>{s.name}</span>
+              <span className="small muted">{s.city} · {s.address}</span>
+              <span className="small" style={{ color: 'var(--accent-ink)', fontWeight: 700 }}>{s.productCount} პროდუქტი</span>
+            </Link>
+          ))}
         </div>
       </section>
     </main>

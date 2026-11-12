@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api'
-import { ErrorBox, Loading, ProductImage, useLoad } from '../components/ui'
+import { ErrorBox, Loading, ProductImage, StoreLogo, useLoad } from '../components/ui'
 import { money } from '../format'
 
 export function ProductGrid({ products }) {
@@ -34,8 +34,9 @@ export default function StorePage() {
         <Link to="/stores" className="muted">მაღაზიები</Link><span>/</span>
         <span style={{ color: 'var(--ink)', fontWeight: 600 }}>{store.name}, {store.city}</span>
       </nav>
-      <div className="page-head">
-        <div className="stack-sm">
+      <div className="row" style={{ gap: 20, flexWrap: 'nowrap' }}>
+        <StoreLogo name={store.name} imageUrl={store.imageUrl} size={80} />
+        <div className="stack-sm" style={{ minWidth: 0 }}>
           <h1>{store.name}</h1>
           <p className="muted">{store.address} · <a href={store.mapUrl} target="_blank" rel="noreferrer">რუკაზე ნახვა</a></p>
         </div>
