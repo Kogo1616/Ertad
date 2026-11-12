@@ -70,7 +70,9 @@ button:disabled { cursor: not-allowed; opacity: .5; }
 
 .muted { color: var(--muted); }
 .small { font-size: 13px; }
-.strike { text-decoration: line-through; color: var(--muted); }
+/* Crossed-out regular price: readable (the "anchor" for the saving) but secondary, with a red 2px strike. */
+.strike { color: color-mix(in srgb, var(--ink) 72%, transparent); font-weight: 600; text-decoration: line-through; text-decoration-color: var(--danger); text-decoration-thickness: 2px; font-variant-numeric: tabular-nums; }
+.save-chip { display: inline-flex; align-items: center; border-radius: var(--r-pill); padding: 3px 10px; background: var(--accent-soft); color: var(--accent-ink); font-size: 13px; font-weight: 800; white-space: nowrap; }
 .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .between { justify-content: space-between; }
 .stack { display: flex; flex-direction: column; gap: 14px; }
@@ -215,7 +217,8 @@ textarea.input { height: auto; min-height: 80px; padding: 12px 14px; font-weight
 .deal-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); padding: 12px; display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: var(--ink); transition: border-color .15s, transform .15s; }
 .deal-card:hover { color: var(--ink); border-color: var(--muted); transform: translateY(-2px); }
 .deal-card .body { display: flex; flex-direction: column; gap: 2px; padding: 0 4px; }
-.price-line { display: flex; align-items: baseline; gap: 8px; padding: 0 4px; }
+.price-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; padding: 0 4px; }
+.price-line .save-chip { align-self: center; }
 .price-line .now { font-size: 26px; font-weight: 800; color: var(--accent-ink); letter-spacing: -0.02em; }
 
 .product-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); padding: 12px; display: flex; flex-direction: column; gap: 10px; text-decoration: none; color: var(--ink); transition: border-color .15s, transform .15s; }
@@ -240,7 +243,7 @@ textarea.input { height: auto; min-height: 80px; padding: 12px 14px; font-weight
 /* hero (deal page) */
 .hero { flex: 3 1 520px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 28px; display: flex; flex-direction: column; gap: 20px; }
 .hero-price { font-size: 72px; font-weight: 800; line-height: 1; letter-spacing: -0.03em; color: var(--accent-ink); }
-.hero-old { font-size: 24px; color: var(--muted); text-decoration: line-through; }
+.hero-old { font-size: 32px; font-weight: 600; color: color-mix(in srgb, var(--ink) 72%, transparent); text-decoration: line-through; text-decoration-color: var(--danger); text-decoration-thickness: 3px; }
 @media (max-width: 600px) { .hero-price { font-size: 52px; } }
 .countdown { display: flex; gap: 8px; flex-wrap: wrap; }
 .countdown div { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-input); padding: 10px 16px; display: flex; flex-direction: column; align-items: center; min-width: 78px; }

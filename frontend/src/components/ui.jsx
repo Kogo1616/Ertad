@@ -71,7 +71,8 @@ export function DealCard({ deal, to, isNew }) {
       </div>
       <div className="price-line">
         <span className="now">{money(deal.groupPrice)}</span>
-        <span className="strike" style={{ fontSize: 15 }}>{money(deal.regularPrice)}</span>
+        <span className="strike" style={{ fontSize: 19 }}>{money(deal.regularPrice)}</span>
+        <span className="save-chip">დაზოგე {money(deal.regularPrice - deal.groupPrice)}</span>
       </div>
       <div className="stack-sm" style={{ padding: '0 4px 4px' }}>
         <Progress value={deal.confirmed} max={deal.min} />

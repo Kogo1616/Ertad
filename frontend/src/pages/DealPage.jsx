@@ -63,7 +63,8 @@ export default function DealPage() {
           <div className="row" style={{ alignItems: 'baseline', gap: 14 }}>
             <span className="hero-price">{money(deal.groupPrice)}</span>
             <span className="hero-old">{money(deal.regularPrice)}</span>
-            <span className="chip" style={{ background: 'var(--accent)', color: 'var(--on-accent)', fontSize: 14 }} aria-label={`${deal.percentOff}% ფასდაკლება`}>−{deal.percentOff}%</span>
+            <span className="chip" style={{ background: 'var(--accent)', color: 'var(--on-accent)', fontSize: 16 }} aria-label={`${deal.percentOff}% ფასდაკლება`}>−{deal.percentOff}%</span>
+            <span className="save-chip" style={{ fontSize: 16, padding: '5px 12px' }}>დაზოგე {money(deal.regularPrice - deal.groupPrice)}</span>
           </div>
           <span className="muted" style={{ fontSize: 15 }}>
             {deal.status === 'Activated'

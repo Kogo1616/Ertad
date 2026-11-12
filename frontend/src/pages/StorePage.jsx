@@ -22,13 +22,13 @@ export function ProductGrid({ products }) {
               <div className="stack-sm" style={{ padding: '0 4px 4px', gap: 8 }}>
                 <div className="price-line" style={{ padding: 0 }}>
                   <span className="now">{money(d.groupPrice)}</span>
-                  <span className="strike" style={{ fontSize: 15 }}>{money(d.regularPrice)}</span>
-                  <span className="small" style={{ color: 'var(--accent-ink)', fontWeight: 700, marginLeft: 'auto' }}>დაზოგე {money(d.regularPrice - d.groupPrice)}</span>
+                  <span className="strike" style={{ fontSize: 19 }}>{money(d.regularPrice)}</span>
+                  <span className="save-chip">დაზოგე {money(d.regularPrice - d.groupPrice)}</span>
                 </div>
                 <Progress value={d.confirmed} max={d.min} />
                 <div className="row between small">
                   <strong>{d.status === 'Activated' ? 'ჯგუფი შეივსო ✓' : `${d.confirmed} / ${d.min} ჯავშანი`}</strong>
-                  <span className="muted"><LiveTimeLeft to={d.deadline} suffix=" დარჩა" /></span>
+                  <span className="muted"><LiveTimeLeft to={d.deadline} /></span>
                 </div>
               </div>
             ) : (

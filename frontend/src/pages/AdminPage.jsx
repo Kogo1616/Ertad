@@ -238,7 +238,7 @@ function DealSection({ deal, setDeal, regularPrice, liveDeal }) {
             <span className="small muted">ასე დაინახავენ მყიდველები</span>
             <div className="row" style={{ alignItems: 'baseline', gap: 10 }}>
               <span style={{ fontSize: 30, fontWeight: 800, color: 'var(--accent-ink)' }}>{price > 0 ? money(price) : '— ₾'}</span>
-              {regularPrice > 0 && <span className="strike" style={{ fontSize: 18 }}>{money(regularPrice)}</span>}
+              {regularPrice > 0 && <span className="strike" style={{ fontSize: 22 }}>{money(regularPrice)}</span>}
               {off != null && <span className="chip" style={{ background: 'var(--accent)', color: 'var(--on-accent)' }}>−{off}% · დაზოგე {money(regularPrice - price)}</span>}
             </div>
             <span className="small">

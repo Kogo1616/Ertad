@@ -7,6 +7,9 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
+    // The project lives in a OneDrive folder, where native file-change events are sometimes missed;
+    // polling makes hot reload reliable there.
+    watch: { usePolling: true, interval: 300 },
     proxy: {
       '/api': 'http://localhost:5080',
       '/uploads': 'http://localhost:5080',
