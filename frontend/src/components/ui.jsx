@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { money, timeLeft, tone } from '../format'
+import { money, tone } from '../format'
 
 export function Logo({ to = '/deals' }) {
   return (
@@ -77,7 +77,7 @@ export function DealCard({ deal, to, isNew }) {
         <Progress value={deal.confirmed} max={deal.min} />
         <div className="row between small">
           <strong>{deal.confirmed} / {deal.min} ჯავშანი</strong>
-          <span className="muted">{isNew || deal.confirmed === 0 ? 'ახალი · ' : ''}{timeLeft(deal.deadline)}</span>
+          <span className="muted">{isNew || deal.confirmed === 0 ? 'ახალი · ' : ''}<LiveTimeLeft to={deal.deadline} /></span>
         </div>
       </div>
     </>
@@ -98,24 +98,52 @@ export function AvatarStack({ initials, total }) {
   )
 }
 
-/** Days / hours / minutes boxes, ticking every 30s. */
-export function Countdown({ to }) {
-  const [, tick] = useState(0)
+/** Re-renders every second until `to` has passed; returns the remaining time split up. */
+function useRemaining(to) {
+  const [now, setNow] = useState(() => Date.now())
+  const end = new Date(to).getTime()
   useEffect(() => {
-    const t = setInterval(() => tick((x) => x + 1), 30000)
+    if (!(end > Date.now())) return
+    const t = setInterval(() => {
+      const n = Date.now()
+      setNow(n)
+      if (n >= end) clearInterval(t)
+    }, 1000)
     return () => clearInterval(t)
-  }, [])
-  const ms = Math.max(0, new Date(to) - Date.now())
-  const m = Math.floor(ms / 60000)
-  const parts = [
-    [Math.floor(m / 1440), 'დღე'],
-    [String(Math.floor((m % 1440) / 60)).padStart(2, '0'), 'საათი'],
-    [String(m % 60).padStart(2, '0'), 'წუთი'],
-  ]
+  }, [end])
+  const total = Math.max(0, Math.floor((end - now) / 1000))
+  return {
+    done: total === 0,
+    d: Math.floor(total / 86400),
+    h: Math.floor((total % 86400) / 3600),
+    m: Math.floor((total % 3600) / 60),
+    s: total % 60,
+  }
+}
+const pad = (n) => String(n).padStart(2, '0')
+
+/** Days / hours / minutes / seconds boxes, ticking live every second. */
+export function Countdown({ to }) {
+  const { done, d, h, m, s } = useRemaining(to)
+  if (done) return <p className="muted" role="status">ვადა ამოიწურა</p>
+  const parts = [[d, 'დღე'], [pad(h), 'საათი'], [pad(m), 'წუთი'], [pad(s), 'წამი']]
   return (
-    <div className="countdown" role="timer" aria-label="დარჩენილი დრო">
+    // role="timer" is not announced every second by screen readers; the label gives the full value on demand.
+    <div className="countdown" role="timer" aria-label={`დარჩენილია ${d} დღე, ${h} საათი, ${m} წუთი`}>
       {parts.map(([v, l]) => <div key={l}><strong>{v}</strong><span>{l}</span></div>)}
     </div>
+  )
+}
+
+/** Compact live time left for cards: "6 დღე 23:41:05", "05:12:09", or "დასრულდა". */
+export function LiveTimeLeft({ to, suffix = '' }) {
+  const { done, d, h, m, s } = useRemaining(to)
+  if (done) return <span>დასრულდა</span>
+  const clock = `${pad(h)}:${pad(m)}:${pad(s)}`
+  return (
+    <span role="timer" style={{ fontVariantNumeric: 'tabular-nums' }}>
+      {d > 0 ? `${d} დღე ${clock}` : clock}{suffix}
+    </span>
   )
 }
 

@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
-import { ErrorBox, Loading, ProductImage, Progress, StoreLogo, useLoad } from '../components/ui'
-import { money, timeLeft } from '../format'
+import { ErrorBox, LiveTimeLeft, Loading, ProductImage, Progress, StoreLogo, useLoad } from '../components/ui'
+import { money } from '../format'
 
 /** Catalog card. With a live group deal it sells the saving: group price vs crossed-out regular price. */
 export function ProductGrid({ products }) {
@@ -28,7 +28,7 @@ export function ProductGrid({ products }) {
                 <Progress value={d.confirmed} max={d.min} />
                 <div className="row between small">
                   <strong>{d.status === 'Activated' ? 'ჯგუფი შეივსო ✓' : `${d.confirmed} / ${d.min} ჯავშანი`}</strong>
-                  <span className="muted">{timeLeft(d.deadline)}{new Date(d.deadline) > Date.now() ? ' დარჩა' : ''}</span>
+                  <span className="muted"><LiveTimeLeft to={d.deadline} suffix=" დარჩა" /></span>
                 </div>
               </div>
             ) : (
