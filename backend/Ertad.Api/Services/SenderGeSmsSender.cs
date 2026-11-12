@@ -9,6 +9,8 @@ public class SenderGeOptions
     public int SmsNo { get; set; } = 2;
     /// <summary>Send Georgian text in Latin letters: 160 instead of 70 characters per paid SMS part.</summary>
     public bool Transliterate { get; set; } = true;
+    /// <summary>1 = skip the SMS subscription check. Must first be enabled for your Brand Name in the sender.ge panel.</summary>
+    public int? Priority { get; set; }
 }
 
 /// <summary>
@@ -26,13 +28,15 @@ public class SenderGeSmsSender(HttpClient http, SenderGeOptions options, ILogger
             throw new SmsException("sender.ge can only send to Georgian mobile numbers");
 
         var content = options.Transliterate ? SmsText.ToLatin(body) : body;
-        var form = new FormUrlEncodedContent(new Dictionary<string, string>
+        var fields = new Dictionary<string, string>
         {
             ["apikey"] = options.ApiKey,
             ["smsno"] = options.SmsNo.ToString(),
             ["destination"] = phone[4..],
             ["content"] = content,
-        });
+        };
+        if (options.Priority != null) fields["priority"] = options.Priority.Value.ToString();
+        var form = new FormUrlEncodedContent(fields);
 
         HttpResponseMessage res;
         try { res = await http.PostAsync(Endpoint, form); }

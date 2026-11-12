@@ -62,6 +62,7 @@ Settings (`appsettings.json` → `Sms:SenderGe`):
 | --- | --- | --- |
 | `SmsNo` | `2` | 2 = informational (no opt-out text). 1 = advertising. |
 | `Transliterate` | `true` | Sends Georgian text in Latin letters ("ertad: sheni kodia 123456"). A Latin SMS part holds 160 characters, a Georgian one only 70, so this costs 2–3× less. |
+| `Priority` | not sent | `1` skips sender.ge's subscription check, so codes reach buyers who opted out of SMS. It only works after you enable it for your Brand Name in the sender.ge panel. |
 
 Only Georgian numbers (+995) can receive SMS through sender.ge. When the real provider is on, the login page no longer shows the code.
 

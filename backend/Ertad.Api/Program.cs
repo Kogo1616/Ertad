@@ -14,7 +14,9 @@ if (builder.Configuration["Sms:Provider"] == "SenderGe")
     if (string.IsNullOrWhiteSpace(senderGe.ApiKey))
         throw new InvalidOperationException("Sms:SenderGe:ApiKey is required when Sms:Provider is SenderGe");
     builder.Services.AddSingleton(senderGe);
-    builder.Services.AddHttpClient<ISmsSender, SenderGeSmsSender>(c => c.Timeout = TimeSpan.FromSeconds(15));
+    // Same limits as sender.ge's production example: 5 s to connect, 15 s in total.
+    builder.Services.AddHttpClient<ISmsSender, SenderGeSmsSender>(c => c.Timeout = TimeSpan.FromSeconds(15))
+        .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler { ConnectTimeout = TimeSpan.FromSeconds(5) });
 }
 else
 {

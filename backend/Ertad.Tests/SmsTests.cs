@@ -57,6 +57,20 @@ public class SenderGeTests
     }
 
     [Fact]
+    public async Task Priority_is_sent_only_when_configured()
+    {
+        var ok = """{"data":[{"messageId":"x","statusId":1,"qnt":1}]}""";
+        var without = new FakeHandler(HttpStatusCode.OK, ok);
+        await Sender(without).SendAsync("+995599112233", "hi");
+        Assert.False(without.Form.ContainsKey("priority"));
+
+        var with = new FakeHandler(HttpStatusCode.OK, ok);
+        var sender = new SenderGeSmsSender(new HttpClient(with), new SenderGeOptions { ApiKey = "k", Priority = 1 }, NullLogger<SenderGeSmsSender>.Instance);
+        await sender.SendAsync("+995599112233", "hi");
+        Assert.Equal("1", with.Form["priority"]);
+    }
+
+    [Fact]
     public async Task Provider_error_becomes_SmsException()
     {
         var h = new FakeHandler(HttpStatusCode.PaymentRequired, """{"message":"overdraft"}""");
