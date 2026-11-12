@@ -52,19 +52,21 @@ function ImageInput({ id, file, currentUrl, onChange }) {
   }
   const shown = preview ?? currentUrl
   return (
-    <div className="stack-sm" style={{ gap: 8 }}>
-      <div className="row" style={{ gap: 12, flexWrap: 'nowrap' }}>
-        <div className="pimg" style={{ width: 72, height: 72, flex: 'none' }}>
-          {shown ? <img src={shown} alt="" /> : <span className="small muted">ფოტო</span>}
-        </div>
-        <span className="btn btn-soft btn-sm" style={{ cursor: 'pointer' }}>
-          {shown ? 'შეცვლა' : 'ფოტოს არჩევა'}
-          <input id={id} type="file" accept={IMAGE_TYPES} hidden onChange={pick} />
-        </span>
-        {file && <button type="button" className="btn btn-ghost btn-sm" onClick={() => onChange(null)}>გაუქმება</button>}
+    <div className="row" style={{ gap: 14 }}>
+      <div className="pimg" style={{ width: 72, height: 72, flex: 'none' }}>
+        {shown ? <img src={shown} alt="" /> : <span className="small muted">ფოტო</span>}
       </div>
-      <span className="small muted" style={{ fontWeight: 500 }}>jpg, png ან webp, 5 MB-მდე</span>
-      {error && <span className="small" style={{ color: 'var(--danger)' }}>{error}</span>}
+      <div className="stack-sm" style={{ gap: 6, alignItems: 'flex-start' }}>
+        <div className="row" style={{ gap: 8 }}>
+          <span className="btn btn-soft btn-sm" style={{ cursor: 'pointer' }}>
+            {shown ? 'შეცვლა' : 'ფოტოს არჩევა'}
+            <input id={id} type="file" accept={IMAGE_TYPES} hidden onChange={pick} />
+          </span>
+          {file && <button type="button" className="btn btn-ghost btn-sm" onClick={() => onChange(null)}>გაუქმება</button>}
+        </div>
+        <span className="small muted" style={{ fontWeight: 500 }}>jpg, png ან webp, 5 MB-მდე</span>
+        {error && <span className="small" style={{ color: 'var(--danger)' }}>{error}</span>}
+      </div>
     </div>
   )
 }
@@ -88,7 +90,7 @@ function SimpleForm({ fields, initial, onSubmit, submitLabel = 'შენახ�
     <form className="card" style={{ gap: 12 }} onSubmit={submit}>
       <div className="form-grid">
         {fields.map(([k, label, type, options]) => (
-          <label key={k} className="field" htmlFor={'f-' + k}>{label}
+          <label key={k} className={'field' + (type === 'image' ? ' field-full' : '')} htmlFor={'f-' + k}>{label}
             {type === 'select' ? (
               <select id={'f-' + k} className="input" value={v[k] ?? ''} onChange={(e) => setV({ ...v, [k]: e.target.value })}>
                 {options.map(([val, text]) => <option key={val} value={val}>{text}</option>)}
@@ -96,7 +98,10 @@ function SimpleForm({ fields, initial, onSubmit, submitLabel = 'შენახ�
             ) : type === 'image' ? (
               <ImageInput id={'f-' + k} file={v[k]} currentUrl={v.imageUrl} onChange={(file) => setV({ ...v, [k]: file })} />
             ) : type === 'checkbox' ? (
-              <input id={'f-' + k} type="checkbox" checked={!!v[k]} onChange={(e) => setV({ ...v, [k]: e.target.checked })} style={{ width: 22, height: 22 }} />
+              <span className="check-row">
+                <input id={'f-' + k} type="checkbox" checked={!!v[k]} onChange={(e) => setV({ ...v, [k]: e.target.checked })} />
+                {v[k] ? 'დიახ' : 'არა'}
+              </span>
             ) : (
               <input id={'f-' + k} className="input" type={type || 'text'} value={v[k] ?? ''} onChange={(e) => setV({ ...v, [k]: e.target.value })} />
             )}
