@@ -101,6 +101,8 @@ public class ResendTests(PostgresFixture pg)
         {
             b.UseSetting("ConnectionStrings:Default", cs);
             b.UseSetting("Jobs:Enabled", "false");
+            b.UseSetting("Seed:AdminEmail", "admin@ertad.ge");   // tests never depend on the real admin credentials
+            b.UseSetting("Seed:AdminPassword", "Admin123!");
             b.UseSetting("Seed:Demo", "true");
         });
         var client = factory.CreateClient();
@@ -123,6 +125,8 @@ public class ResendTests(PostgresFixture pg)
         {
             b.UseSetting("ConnectionStrings:Default", cs);
             b.UseSetting("Jobs:Enabled", "false");
+            b.UseSetting("Seed:AdminEmail", "admin@ertad.ge");   // tests never depend on the real admin credentials
+            b.UseSetting("Seed:AdminPassword", "Admin123!");
             b.UseSetting("Seed:Demo", "true");
         });
         var client = factory.CreateClient();

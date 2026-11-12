@@ -110,12 +110,14 @@ function SimpleForm({ fields, initial, onSubmit, submitLabel = 'შენახ�
     <form className="card" style={{ gap: 12 }} onSubmit={submit} noValidate>
       <div className="form-grid">
         {fields.map(([k, label, type, options]) => (
-          <label key={k} className={'field' + (type === 'image' ? ' field-full' : '')} htmlFor={'f-' + k}>
+          <label key={k} className={'field' + (type === 'image' || type === 'textarea' ? ' field-full' : '')} htmlFor={'f-' + k}>
             <span>{label}{required.includes(k) && <span style={{ color: 'var(--danger)' }} aria-label="სავალდებულო"> *</span>}</span>
             {type === 'select' ? (
               <select id={'f-' + k} className="input" value={v[k] ?? ''} onChange={(e) => setV({ ...v, [k]: e.target.value })}>
                 {options.map(([val, text]) => <option key={val} value={val}>{text}</option>)}
               </select>
+            ) : type === 'textarea' ? (
+              <textarea id={'f-' + k} className="input" rows={3} maxLength={500} value={v[k] ?? ''} onChange={(e) => setV({ ...v, [k]: e.target.value })} />
             ) : type === 'image' ? (
               <ImageInput id={'f-' + k} file={v[k]} currentUrl={v.imageUrl} onChange={(file) => setV({ ...v, [k]: file })} />
             ) : type === 'checkbox' ? (
@@ -145,7 +147,12 @@ function Stores() {
   const [stores, error, reload] = useLoad(() => api('/admin/stores'), [])
   const [editing, setEditing] = useState(null)
   const [rowError, setRowError] = useState(null)
-  const fields = [['name', 'სახელი'], ['city', 'ქალაქი'], ['address', 'მისამართი'], ['mapUrl', 'რუკის ბმული'], ['commissionPerItem', 'საკომისიო / ერთეული, ₾', 'number'], ['isActive', 'აქტიური', 'checkbox'], ['photo', 'ფოტო ან ლოგო', 'image']]
+  const fields = [
+    ['name', 'სახელი'], ['city', 'ქალაქი'], ['address', 'მისამართი'], ['mapUrl', 'რუკის ბმული'],
+    ['phone', 'ტელეფონი', 'tel'], ['workingHours', 'სამუშაო საათები (მაგ. ორშ–შაბ 10:00–20:00)'],
+    ['commissionPerItem', 'საკომისიო / ერთეული, ₾', 'number'], ['isActive', 'აქტიური', 'checkbox'],
+    ['description', 'აღწერა (მოკლედ მაღაზიის შესახებ)', 'textarea'], ['photo', 'ფოტო ან ლოგო', 'image'],
+  ]
   const save = async ({ photo, ...v }) => {
     const body = { ...v, commissionPerItem: Number(v.commissionPerItem) }
     const saved = await api(editing ? `/admin/stores/${editing.id}` : '/admin/stores', { method: editing ? 'PUT' : 'POST', body })
@@ -171,7 +178,7 @@ function Stores() {
       </div>
       <h2>{editing ? `რედაქტირება: ${editing.name}` : 'ახალი მაღაზია'}</h2>
       <SimpleForm key={editing?.id ?? 'new'} fields={fields} onSubmit={save} required={['name']}
-        initial={editing ?? { name: '', city: 'ქუთაისი', address: '', mapUrl: '', commissionPerItem: 5, isActive: true }} />
+        initial={editing ?? { name: '', city: 'ქუთაისი', address: '', mapUrl: '', phone: '', workingHours: '', description: '', commissionPerItem: 5, isActive: true }} />
     </section>
   )
 }

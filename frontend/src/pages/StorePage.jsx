@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
-import { ErrorBox, LiveTimeLeft, Loading, ProductImage, Progress, StoreLogo, useLoad } from '../components/ui'
+import { ClockIcon, ErrorBox, LiveTimeLeft, Loading, PhoneIcon, PinIcon, ProductImage, Progress, StoreLogo, useLoad } from '../components/ui'
 import { money } from '../format'
 
 /** Catalog card. With a live group deal it sells the saving: group price vs crossed-out regular price. */
@@ -102,7 +102,18 @@ export default function StorePage() {
           <StoreLogo name={store.name} imageUrl={store.imageUrl} size={80} />
           <div className="stack-sm" style={{ minWidth: 0 }}>
             <h1>{store.name}</h1>
-            <p className="muted">{store.address} · <a href={store.mapUrl} target="_blank" rel="noreferrer">რუკაზე ნახვა</a></p>
+            {store.description && <p className="muted" style={{ maxWidth: 640 }}>{store.description}</p>}
+            <ul className="store-info" style={{ flexDirection: 'row', flexWrap: 'wrap', gap: '6px 18px', fontSize: 14 }}>
+              {(store.address || store.city) && (
+                <li><PinIcon />
+                  {store.mapUrl
+                    ? <a href={store.mapUrl} target="_blank" rel="noreferrer">{[store.address, store.city].filter(Boolean).join(', ')}</a>
+                    : <span>{[store.address, store.city].filter(Boolean).join(', ')}</span>}
+                </li>
+              )}
+              {store.workingHours && <li><ClockIcon /><span>{store.workingHours}</span></li>}
+              {store.phone && <li><PhoneIcon /><a href={`tel:${store.phone.replace(/[^\d+]/g, '')}`}>{store.phone}</a></li>}
+            </ul>
           </div>
         </div>
         <div className="catalog-tools">

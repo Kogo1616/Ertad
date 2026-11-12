@@ -354,3 +354,34 @@ tr:last-child td { border-bottom: 0; }
 .suggest-all { justify-content: center; font-size: 13px; font-weight: 700; color: var(--accent-ink); border-top: 1px solid var(--border); border-radius: 0 0 var(--r-input) var(--r-input); margin-top: 4px; }
 .suggest-empty { padding: 14px 10px; color: var(--muted); font-size: 14px; }
 :root[data-theme="light"] .suggest { box-shadow: 0 12px 32px rgba(15, 23, 42, .12); }
+
+/* stores page (pages/StoresPage.jsx) */
+.stores-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); padding: 12px; }
+.stores-toolbar .search { background: var(--surface-2); }
+.stores-toolbar .filter { height: 40px; }
+.grid-stores { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px; }
+@media (max-width: 400px) { .grid-stores { grid-template-columns: 1fr; } }
+.store-card-lg { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; display: flex; flex-direction: column; transition: border-color .15s, transform .15s; }
+.store-card-lg:hover { border-color: var(--muted); transform: translateY(-2px); }
+@media (prefers-reduced-motion: reduce) { .store-card-lg, .store-card-lg:hover { transition: none; transform: none; } }
+.store-cover { position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 2px; height: 140px; background: var(--surface-2); }
+.store-cover img { width: 100%; height: 140px; object-fit: cover; display: block; background: #fff; }
+.store-cover-empty { display: flex; align-items: center; justify-content: center; font-size: 56px; font-weight: 800; color: var(--muted); opacity: .35; }
+.store-cover-badge { position: absolute; left: 12px; top: 12px; }
+.store-body { padding: 0 18px 18px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+.store-title { display: flex; align-items: flex-start; gap: 12px; margin-top: -28px; }
+/* Only the logo overlaps the cover photo; the name starts below it. */
+.store-title > div:last-child { padding-top: 34px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.store-logo-ring { position: relative; border: 3px solid var(--surface); border-radius: 17px; background: var(--surface); line-height: 0; }
+.store-name { color: var(--ink); text-decoration: none; }
+.store-name:hover { color: var(--accent-ink); }
+.store-desc { color: var(--muted); font-size: 14px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.store-info { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--muted); }
+.store-info li { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.store-info a, .store-info span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.store-info a { color: var(--ink); text-decoration: none; }
+.store-info a:hover { color: var(--accent-ink); text-decoration: underline; }
+.store-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0; margin-top: auto; }
+.store-stats div { background: var(--surface-2); border-radius: var(--r-input); padding: 8px 10px; display: flex; flex-direction: column-reverse; gap: 2px; }
+.store-stats dt { font-size: 11px; color: var(--muted); }
+.store-stats dd { margin: 0; font-size: 20px; font-weight: 800; }

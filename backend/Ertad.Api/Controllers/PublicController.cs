@@ -20,10 +20,29 @@ public class PublicController(AppDbContext db, DealService deals) : ControllerBa
     private IQueryable<Deal> DealsQuery => db.Deals.AsNoTracking().Include(d => d.StoreProduct).ThenInclude(p => p.Store);
 
     [HttpGet("stores")]
-    public async Task<IActionResult> Stores() =>
-        Ok(await db.Stores.AsNoTracking().Where(s => s.IsActive)
-            .Select(s => new { s.Id, s.Name, s.City, s.Address, s.ImageUrl, productCount = s.Products.Count(p => p.IsActive) })
-            .ToListAsync());
+    public async Task<IActionResult> Stores()
+    {
+        var now = DateTime.UtcNow;
+        var rows = await db.Stores.AsNoTracking().Where(s => s.IsActive)
+            .Select(s => new
+            {
+                s.Id, s.Name, s.City, s.Address, s.MapUrl, s.ImageUrl, s.Description, s.Phone, s.WorkingHours,
+                productCount = s.Products.Count(p => p.IsActive),
+                activeDeals = db.Deals.Count(d => d.StoreProduct.StoreId == s.Id && Live.Contains(d.Status) && d.ReservationDeadline > now),
+                interestCount = db.DiscountInterests.Count(i => i.StoreProduct.StoreId == s.Id && i.Status == InterestStatus.Active),
+                bestRatio = db.Deals.Where(d => d.StoreProduct.StoreId == s.Id && Live.Contains(d.Status) && d.ReservationDeadline > now)
+                    .Max(d => (decimal?)((d.RegularPriceSnapshot - d.GroupPrice) / d.RegularPriceSnapshot)),
+                previewImages = s.Products.Where(p => p.IsActive && p.ImageUrl != null).OrderBy(p => p.Id).Select(p => p.ImageUrl).Take(3).ToList(),
+            })
+            .ToListAsync();
+
+        return Ok(rows.Select(s => new
+        {
+            s.Id, s.Name, s.City, s.Address, s.MapUrl, s.ImageUrl, s.Description, s.Phone, s.WorkingHours,
+            s.productCount, s.activeDeals, s.interestCount, s.previewImages,
+            maxDiscount = s.bestRatio == null ? (int?)null : (int)Math.Round(s.bestRatio.Value * 100),
+        }));
+    }
 
     [HttpGet("stores/{id:int}")]
     public async Task<IActionResult> Store(int id)
@@ -31,7 +50,7 @@ public class PublicController(AppDbContext db, DealService deals) : ControllerBa
         var store = await db.Stores.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id && s.IsActive);
         if (store == null) return NotFound();
         var products = await ProductCards(db.StoreProducts.Where(p => p.StoreId == id && p.IsActive));
-        return Ok(new { store.Id, store.Name, store.City, store.Address, store.MapUrl, store.ImageUrl, products });
+        return Ok(new { store.Id, store.Name, store.City, store.Address, store.MapUrl, store.ImageUrl, store.Description, store.Phone, store.WorkingHours, products });
     }
 
     [HttpGet("products")]

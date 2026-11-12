@@ -18,6 +18,8 @@ public class AdminTests(PostgresFixture pg)
         {
             b.UseSetting("ConnectionStrings:Default", cs);
             b.UseSetting("Jobs:Enabled", "false");
+            b.UseSetting("Seed:AdminEmail", "admin@ertad.ge");   // tests never depend on the real admin credentials
+            b.UseSetting("Seed:AdminPassword", "Admin123!");
         });
         var admin = factory.CreateClient();
         (await admin.PostAsJsonAsync("/api/auth/staff-login", new { email = "admin@ertad.ge", password = "Admin123!" })).EnsureSuccessStatusCode();
@@ -55,6 +57,20 @@ public class AdminTests(PostgresFixture pg)
         Assert.Contains("\"min\":10", catalog);
         Assert.Contains("ბლენდერი", await admin.GetStringAsync("/api/deals"));
         Assert.Contains("\"liveDeal\":{", await admin.GetStringAsync("/api/admin/products"));
+
+        // Store details and stats on the public store list.
+        (await admin.PutAsJsonAsync($"/api/admin/stores/{store.Id}", new
+        {
+            name = "მაღაზია", city = "ქუთაისი", commissionPerItem = 5, isActive = true,
+            description = "საყოფაცხოვრებო ტექნიკა", phone = "+995 555 12 34 56", workingHours = "ორშ–შაბ 10:00–20:00",
+        })).EnsureSuccessStatusCode();
+        var stores = await admin.GetStringAsync("/api/stores");
+        Assert.Contains("საყოფაცხოვრებო ტექნიკა", stores);
+        Assert.Contains("ორშ–შაბ 10:00–20:00", stores);
+        Assert.Contains("\"activeDeals\":1", stores);
+        Assert.Contains("\"maxDiscount\":25", stores);
+        Assert.Contains("\"productCount\":1", stores);
+        Assert.Contains("+995 555 12 34 56", await admin.GetStringAsync($"/api/stores/{store.Id}"));
     }
 
     [Fact]
@@ -120,6 +136,8 @@ public class AdminTests(PostgresFixture pg)
         {
             b.UseSetting("ConnectionStrings:Default", cs);
             b.UseSetting("Jobs:Enabled", "false");
+            b.UseSetting("Seed:AdminEmail", "admin@ertad.ge");   // tests never depend on the real admin credentials
+            b.UseSetting("Seed:AdminPassword", "Admin123!");
             // Seed:Demo is off by default: only the admin account exists.
         });
         var admin = factory.CreateClient();

@@ -46,6 +46,11 @@ public class Store
     public string Address { get; set; } = "";
     public string MapUrl { get; set; } = "";
     public string? ImageUrl { get; set; }
+    /// <summary>Short "about the store" text shown on the store list and store page.</summary>
+    public string Description { get; set; } = "";
+    public string Phone { get; set; } = "";
+    /// <summary>Free text, e.g. "ორშ–შაბ 10:00–20:00".</summary>
+    public string WorkingHours { get; set; } = "";
     public decimal CommissionPerItem { get; set; } = 5;
     public bool IsActive { get; set; } = true;
     public List<StoreProduct> Products { get; set; } = [];

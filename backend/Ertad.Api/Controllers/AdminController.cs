@@ -14,7 +14,8 @@ namespace Ertad.Api.Controllers;
 [Authorize(Roles = Roles.Admin)]
 public class AdminController(AppDbContext db, DealService deals, IWebHostEnvironment env) : ControllerBase
 {
-    public record StoreInput(string? Name, string? City, string? Address, string? MapUrl, decimal CommissionPerItem, bool IsActive);
+    public record StoreInput(string? Name, string? City, string? Address, string? MapUrl, decimal CommissionPerItem, bool IsActive,
+        string? Description = null, string? Phone = null, string? WorkingHours = null);
     public record ProductInput(int StoreId, string? Name, string? Description, decimal RegularPrice, bool IsActive);
     public record StaffInput(string Email, string Password, StaffRole Role, int? StoreId);
 
@@ -50,6 +51,9 @@ public class AdminController(AppDbContext db, DealService deals, IWebHostEnviron
         string.IsNullOrWhiteSpace(i.Name) ? "მაღაზიის სახელი სავალდებულოა"
         : i.Name.Trim().Length > MaxName ? $"სახელი მაქსიმუმ {MaxName} სიმბოლო"
         : i.CommissionPerItem < 0 ? "საკომისიო არ შეიძლება იყოს უარყოფითი"
+        : (i.Description?.Trim().Length ?? 0) > 500 ? "აღწერა მაქსიმუმ 500 სიმბოლო"
+        : (i.Phone?.Trim().Length ?? 0) > 30 ? "ტელეფონი მაქსიმუმ 30 სიმბოლო"
+        : (i.WorkingHours?.Trim().Length ?? 0) > 100 ? "სამუშაო საათები მაქსიმუმ 100 სიმბოლო"
         : null;
 
     private static string? Validate(ProductInput i) =>
@@ -62,6 +66,7 @@ public class AdminController(AppDbContext db, DealService deals, IWebHostEnviron
     {
         s.Name = i.Name!.Trim(); s.City = i.City?.Trim() ?? ""; s.Address = i.Address?.Trim() ?? ""; s.MapUrl = i.MapUrl?.Trim() ?? "";
         s.CommissionPerItem = i.CommissionPerItem; s.IsActive = i.IsActive;
+        s.Description = i.Description?.Trim() ?? ""; s.Phone = i.Phone?.Trim() ?? ""; s.WorkingHours = i.WorkingHours?.Trim() ?? "";
     }
 
     // ---- products
