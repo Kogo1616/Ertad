@@ -144,6 +144,19 @@ public class Commission
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
 
+/// <summary>A store that wants to join, sent from the public "for stores" page.</summary>
+public class PartnerLead
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = "";
+    public string StoreName { get; set; } = "";
+    public string Phone { get; set; } = "";
+    public string City { get; set; } = "";
+    public string Message { get; set; } = "";
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public bool Handled { get; set; }
+}
+
 public class NotificationLog
 {
     public int Id { get; set; }

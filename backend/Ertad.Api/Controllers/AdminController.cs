@@ -244,6 +244,18 @@ public class AdminController(AppDbContext db, DealService deals, IWebHostEnviron
         return Ok();
     }
 
+    // ---- partner applications
+    [HttpGet("partner-leads")]
+    public async Task<IActionResult> PartnerLeads() =>
+        Ok(await db.PartnerLeads.AsNoTracking().OrderBy(l => l.Handled).ThenByDescending(l => l.CreatedAt).Take(500).ToListAsync());
+
+    [HttpPost("partner-leads/{id:int}/handled")]
+    public async Task<IActionResult> MarkLeadHandled(int id, [FromQuery] bool handled = true)
+    {
+        var n = await db.PartnerLeads.Where(l => l.Id == id).ExecuteUpdateAsync(s => s.SetProperty(l => l.Handled, handled));
+        return n == 0 ? NotFound() : Ok();
+    }
+
     [HttpGet("notifications")]
     public async Task<IActionResult> Notifications() =>
         Ok(await db.NotificationLogs.AsNoTracking()

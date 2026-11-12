@@ -3,6 +3,7 @@ import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from 'react
 import { isStaff, staffRoleName, useAuth } from '../auth'
 import { Loading, Logo, StaffBuyerNote } from './ui'
 import SearchBox from './SearchBox'
+import { SiteFooter } from './SiteParts'
 import ThemeToggle from './ThemeToggle'
 
 /** Round icon button, same size and style as the theme toggle. */
@@ -52,6 +53,7 @@ export function SiteLayout() {
         </div>
       </header>
       <Outlet />
+      <SiteFooter />
     </>
   )
 }

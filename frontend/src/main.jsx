@@ -5,6 +5,8 @@ import { AuthProvider } from './auth'
 import { ConfirmProvider } from './components/ConfirmDialog'
 import { RequireBuyer, SiteLayout, StoreLayout } from './components/Layouts'
 import DealsPage from './pages/DealsPage'
+import HomePage from './pages/HomePage'
+import ForStoresPage from './pages/ForStoresPage'
 import StoresPage from './pages/StoresPage'
 import StorePage from './pages/StorePage'
 import ProductPage from './pages/ProductPage'
@@ -28,7 +30,8 @@ createRoot(document.getElementById('root')).render(
       <BrowserRouter>
         <Routes>
           <Route element={<SiteLayout />}>
-            <Route path="/" element={<Navigate to="/deals" replace />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/for-stores" element={<ForStoresPage />} />
             <Route path="/deals" element={<DealsPage />} />
             <Route path="/stores" element={<StoresPage />} />
             <Route path="/stores/:storeId" element={<StorePage />} />
@@ -48,7 +51,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="reports" element={<StoreReports />} />
             <Route path="reports/:dealId" element={<StoreReports />} />
           </Route>
-          <Route path="*" element={<Navigate to="/deals" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </ConfirmProvider>

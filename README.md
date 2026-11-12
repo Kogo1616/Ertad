@@ -156,9 +156,9 @@ docs/
 
 ## Routes
 
-Buyer: `/deals`, `/stores`, `/stores/:id`, `/stores/:id/products/:id`, `/d/:slug`, `/login`, `/my/reservations`, `/my/reservations/:id`, `/how`
+Buyer: `/` (home), `/deals`, `/stores`, `/stores/:id`, `/stores/:id/products/:id`, `/d/:slug`, `/login`, `/my/reservations`, `/my/reservations/:id`, `/how` (with FAQ), `/for-stores` (partner application form)
 Store: `/store`, `/store/deals/new`, `/store/redeem`, `/store/reports/:dealId`
-Admin: `/admin`
+Admin: `/admin` (stores, products, staff, deals, partner applications, notification log)
 
 ## Not in the MVP
 Online payment, a native app, multiple cities, reviews, a real SMS gateway (swap `DevSmsSender` for a real `ISmsSender`), inbound SMS replies.

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { HowItWorks } from '../components/ui'
+import { Faq } from '../components/SiteParts'
 
 export default function HowPage() {
   return (
@@ -15,6 +16,7 @@ export default function HowPage() {
         <div className="tile tone-neutral"><strong>ვერ შეგროვდა?</strong><span className="small muted">ჯავშნები ავტომატურად უქმდება და SMS-ით გაცნობებთ.</span></div>
       </div>
       <div className="row"><Link to="/deals" className="btn">აქტიური შეთავაზებები</Link><Link to="/stores" className="btn btn-soft">მაღაზიები</Link></div>
+      <div id="faq" style={{ scrollMarginTop: 90 }}><Faq /></div>
     </main>
   )
 }

@@ -12,7 +12,7 @@ const SORTS = [
   ['name', 'ანბანით'],
 ]
 
-function StoreCard({ s }) {
+export function StoreCard({ s }) {
   const images = s.previewImages ?? []
   return (
     <article className="store-card-lg">

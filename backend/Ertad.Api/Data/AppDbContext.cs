@@ -16,6 +16,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<PickupCode> PickupCodes => Set<PickupCode>();
     public DbSet<Commission> Commissions => Set<Commission>();
     public DbSet<NotificationLog> NotificationLogs => Set<NotificationLog>();
+    public DbSet<PartnerLead> PartnerLeads => Set<PartnerLead>();
 
     protected override void ConfigureConventions(ModelConfigurationBuilder b)
     {

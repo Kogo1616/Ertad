@@ -6,7 +6,7 @@ import { ErrorBox, Loading, StatusChip, useLoad } from '../components/ui'
 import { useConfirm } from '../components/ConfirmDialog'
 import { DEAL_STATUS, dateTime, money, timeLeft, when } from '../format'
 
-const TABS = [['stores', 'მაღაზიები'], ['products', 'პროდუქტები'], ['staff', 'თანამშრომლები'], ['deals', 'შეთავაზებები'], ['log', 'შეტყობინებები']]
+const TABS = [['stores', 'მაღაზიები'], ['products', 'პროდუქტები'], ['staff', 'თანამშრომლები'], ['deals', 'შეთავაზებები'], ['leads', 'განაცხადები'], ['log', 'შეტყობინებები']]
 
 export default function AdminPage() {
   const { me } = useAuth()
@@ -24,6 +24,7 @@ export default function AdminPage() {
       {tab === 'products' && <Products />}
       {tab === 'staff' && <Staff />}
       {tab === 'deals' && <Deals />}
+      {tab === 'leads' && <Leads />}
       {tab === 'log' && <Log />}
     </main>
   )
@@ -415,6 +416,34 @@ function Deals() {
           </tr>
         ))}</tbody>
       </table>
+    </section>
+  )
+}
+
+/** "Become a partner" applications from the for-stores page. */
+function Leads() {
+  const [leads, error, reload] = useLoad(() => api('/admin/partner-leads'), [])
+  const toggle = async (l) => { await api(`/admin/partner-leads/${l.id}/handled?handled=${!l.handled}`, { method: 'POST' }); reload() }
+  return (
+    <section className="card table-wrap">
+      <ErrorBox error={error} />
+      {leads?.length === 0 && <span className="muted">განაცხადი ჯერ არ არის. ფორმა: <a href="/for-stores#apply" target="_blank" rel="noreferrer">/for-stores</a></span>}
+      {leads?.length > 0 && (
+        <table>
+          <thead><tr><th>თარიღი</th><th>მაღაზია</th><th>სახელი</th><th>ტელეფონი</th><th>ქალაქი</th><th>შეტყობინება</th><th></th></tr></thead>
+          <tbody>{leads.map((l) => (
+            <tr key={l.id} style={l.handled ? { opacity: 0.55 } : undefined}>
+              <td style={{ whiteSpace: 'nowrap' }}>{dateTime(l.createdAt)}</td>
+              <td><strong>{l.storeName}</strong></td>
+              <td>{l.name}</td>
+              <td style={{ whiteSpace: 'nowrap' }}><a href={`tel:${l.phone.replace(/[^\d+]/g, '')}`}>{l.phone}</a></td>
+              <td>{l.city || '—'}</td>
+              <td className="small">{l.message || '—'}</td>
+              <td><button type="button" className="btn btn-sm btn-soft" onClick={() => toggle(l)}>{l.handled ? 'დაბრუნება' : 'დამუშავებულია ✓'}</button></td>
+            </tr>
+          ))}</tbody>
+        </table>
+      )}
     </section>
   )
 }

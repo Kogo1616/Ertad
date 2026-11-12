@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { money, tone } from '../format'
 
-export function Logo({ to = '/deals' }) {
+export function Logo({ to = '/' }) {
   return (
     <Link to={to} className="logo" aria-label="ერთად — მთავარი">
       <span className="logo-mark" aria-hidden="true"><span /><span /><span /></span>

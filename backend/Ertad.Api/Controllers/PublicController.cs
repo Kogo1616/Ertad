@@ -92,6 +92,59 @@ public class PublicController(AppDbContext db, DealService deals) : ControllerBa
         return rows.Cast<object>().ToList();
     }
 
+    /// <summary>Live numbers for the home page. Only counts and sums — nothing about individual buyers.</summary>
+    [HttpGet("stats")]
+    public async Task<IActionResult> Stats()
+    {
+        var now = DateTime.UtcNow;
+        var taken = db.Reservations.Where(r => r.Status == ReservationStatus.Confirmed || r.Status == ReservationStatus.Redeemed);
+        return Ok(new
+        {
+            activeDeals = await db.Deals.CountAsync(d => Live.Contains(d.Status) && d.ReservationDeadline > now),
+            stores = await db.Stores.CountAsync(s => s.IsActive),
+            products = await db.StoreProducts.CountAsync(p => p.IsActive && p.Store.IsActive),
+            reservations = await taken.CountAsync(),
+            saved = await taken.SumAsync(r => (decimal?)(r.Deal.RegularPriceSnapshot - r.Deal.GroupPrice)) ?? 0,
+            interested = await db.DiscountInterests.Where(i => i.Status == InterestStatus.Active).Select(i => i.UserId).Distinct().CountAsync(),
+        });
+    }
+
+    /// <summary>Most requested products (by active buyer requests).</summary>
+    [HttpGet("products/popular")]
+    public async Task<IActionResult> Popular([FromQuery] int limit = 4)
+    {
+        limit = Math.Clamp(limit, 1, 24);
+        var q = db.StoreProducts.Where(p => p.IsActive && p.Store.IsActive)
+            .OrderByDescending(p => db.DiscountInterests.Count(i => i.StoreProductId == p.Id && i.Status == InterestStatus.Active))
+            .ThenBy(p => p.Id)
+            .Take(limit);
+        return Ok(await ProductCards(q, keepOrder: true));
+    }
+
+    public record PartnerLeadInput(string? Name, string? StoreName, string? Phone, string? City, string? Message, string? Website);
+
+    /// <summary>"Become a partner" form on the for-stores page. Saved for the admin to follow up.</summary>
+    [HttpPost("partner-leads")]
+    public async Task<IActionResult> CreatePartnerLead(PartnerLeadInput i)
+    {
+        // Honeypot: a hidden field real people leave empty; bots fill everything in.
+        if (!string.IsNullOrEmpty(i.Website)) return Ok(new { ok = true });
+        string? T(string? s, int max) => s?.Trim() is { Length: > 0 } t ? (t.Length > max ? t[..max] : t) : null;
+        var name = T(i.Name, 100); var store = T(i.StoreName, 100); var phone = T(i.Phone, 30);
+        if (name == null || store == null || phone == null)
+            return BadRequest(new { error = "შეავსე სახელი, მაღაზიის სახელი და ტელეფონი" });
+        if (Format.NormalizePhone(phone) == null) return BadRequest(new { error = "ტელეფონის ნომერი არასწორია" });
+
+        // Light flood guard: at most 3 applications from one phone per day.
+        var dayAgo = DateTime.UtcNow.AddDays(-1);
+        if (await db.PartnerLeads.CountAsync(l => l.Phone == phone && l.CreatedAt > dayAgo) >= 3)
+            return BadRequest(new { error = "განაცხადი უკვე მიღებულია, მალე დაგიკავშირდებით" });
+
+        db.PartnerLeads.Add(new PartnerLead { Name = name, StoreName = store, Phone = phone, City = T(i.City, 60) ?? "", Message = T(i.Message, 1000) ?? "" });
+        await db.SaveChangesAsync();
+        return Ok(new { ok = true });
+    }
+
     [HttpGet("products/{id:int}")]
     public async Task<IActionResult> Product(int id)
     {
