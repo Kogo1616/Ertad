@@ -1,7 +1,8 @@
-import { useState } from 'react'
+
 import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { isStaff, staffRoleName, useAuth } from '../auth'
-import { Loading, Logo, SearchIcon, StaffBuyerNote } from './ui'
+import { Loading, Logo, StaffBuyerNote } from './ui'
+import SearchBox from './SearchBox'
 import ThemeToggle from './ThemeToggle'
 
 /** Round icon button, same size and style as the theme toggle. */
@@ -19,11 +20,6 @@ function LogoutButton({ onClick }) {
 export function SiteLayout() {
   const { me, logout } = useAuth()
   const nav = useNavigate()
-  const [q, setQ] = useState('')
-  const search = (e) => {
-    e.preventDefault()
-    nav('/stores' + (q.trim() ? '?q=' + encodeURIComponent(q.trim()) : ''))
-  }
   const buyer = me?.authenticated && me.role === 'Buyer'
   const staff = me?.authenticated && me.role !== 'Buyer'
   const signOut = async () => { await logout(); nav('/deals') }
@@ -38,10 +34,7 @@ export function SiteLayout() {
             <NavLink to="/deals">აქტიური შეთავაზებები</NavLink>
             <NavLink to="/how">როგორ მუშაობს</NavLink>
           </nav>
-          <form className="search" onSubmit={search} role="search">
-            <SearchIcon />
-            <input type="search" aria-label="ძიება" placeholder="მოძებნე პროდუქტი ან მაღაზია" value={q} onChange={(e) => setQ(e.target.value)} />
-          </form>
+          <SearchBox />
           {/* Right-hand actions stay together on one line; on narrow screens the whole group wraps. */}
           <div className="header-actions">
             {!staff && <Link to="/my/reservations" className="header-link" aria-label="ჩემი ჯავშნები">

@@ -35,20 +35,29 @@ public class PublicController(AppDbContext db, DealService deals) : ControllerBa
     }
 
     [HttpGet("products")]
-    public async Task<IActionResult> Search([FromQuery] string? q)
+    /// <summary>Product search; also feeds the header's live suggestions (?q=…&amp;limit=6).</summary>
+    public async Task<IActionResult> Search([FromQuery] string? q, [FromQuery] int limit = 60)
     {
+        limit = Math.Clamp(limit, 1, 60);
         var query = db.StoreProducts.Where(p => p.IsActive && p.Store.IsActive);
-        if (!string.IsNullOrWhiteSpace(q))
-        {
-            var term = q.Trim().ToLower();
-            query = query.Where(p => p.Name.ToLower().Contains(term) || p.Store.Name.ToLower().Contains(term));
-        }
-        return Ok(await ProductCards(query.Take(60)));
+        if (string.IsNullOrWhiteSpace(q))
+            return Ok(await ProductCards(query.OrderBy(p => p.Id).Take(limit)));
+
+        var term = q.Trim().ToLower();
+        // Best matches first: name starts with the text, then name contains it, then store name matches.
+        var ranked = query
+            .Where(p => p.Name.ToLower().Contains(term) || p.Store.Name.ToLower().Contains(term))
+            .OrderByDescending(p => p.Name.ToLower().StartsWith(term))
+            .ThenByDescending(p => p.Name.ToLower().Contains(term))
+            .ThenBy(p => p.Name)
+            .Take(limit);
+        return Ok(await ProductCards(ranked, keepOrder: true));
     }
 
-    private async Task<List<object>> ProductCards(IQueryable<StoreProduct> q)
+    private async Task<List<object>> ProductCards(IQueryable<StoreProduct> q, bool keepOrder = false)
     {
-        var rows = await q.AsNoTracking().OrderBy(p => p.Id).Select(p => new
+        if (!keepOrder) q = q.OrderBy(p => p.Id);
+        var rows = await q.AsNoTracking().Select(p => new
         {
             p.Id, p.Name, p.Description, p.ImageUrl, p.RegularPrice, p.StoreId, storeName = p.Store.Name, storeCity = p.Store.City,
             interestCount = db.DiscountInterests.Count(i => i.StoreProductId == p.Id && i.Status == InterestStatus.Active),

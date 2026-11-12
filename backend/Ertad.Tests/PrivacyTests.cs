@@ -1,3 +1,4 @@
+using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Ertad.Tests;
@@ -28,6 +29,11 @@ public class PrivacyTests(PostgresFixture pg)
             Assert.DoesNotContain("median", body, StringComparison.OrdinalIgnoreCase);
             Assert.DoesNotContain("priceCounts", body, StringComparison.OrdinalIgnoreCase);
         }
+
+        // Live search: best match first, limit respected.
+        var hits = await client.GetFromJsonAsync<List<Dictionary<string, object>>>("/api/products?q=" + Uri.EscapeDataString("ბლ") + "&limit=2");
+        Assert.InRange(hits!.Count, 1, 2);
+        Assert.StartsWith("ბლ", hits[0]["name"].ToString());
 
         // The store aggregates require a staff login.
         Assert.Equal(401, (int)(await client.GetAsync("/api/store/products/1/demand")).StatusCode);

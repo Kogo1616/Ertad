@@ -1,7 +1,8 @@
 // Tiny fetch wrapper. Cookies carry the session; errors come back as { error: "..." }.
-export async function api(path, { method = 'GET', body, form } = {}) {
+export async function api(path, { method = 'GET', body, form, signal } = {}) {
   const res = await fetch('/api' + path, {
     method,
+    signal,
     credentials: 'include',
     headers: body !== undefined ? { 'Content-Type': 'application/json' } : undefined,
     body: form ?? (body !== undefined ? JSON.stringify(body) : undefined),
