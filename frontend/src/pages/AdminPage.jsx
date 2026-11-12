@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom'
 import { api } from '../api'
 import { useAuth } from '../auth'
 import { ErrorBox, Loading, StatusChip, useLoad } from '../components/ui'
+import { useConfirm } from '../components/ConfirmDialog'
 import { DEAL_STATUS, dateTime, money } from '../format'
 
 const TABS = [['stores', 'მაღაზიები'], ['products', 'პროდუქტები'], ['staff', 'თანამშრომლები'], ['deals', 'შეთავაზებები'], ['log', 'შეტყობინებები']]
@@ -175,6 +176,7 @@ function Stores() {
 }
 
 function Products() {
+  const confirm = useConfirm()
   const [products, error, reload] = useLoad(() => api('/admin/products'), [])
   const [stores] = useLoad(() => api('/admin/stores'), [])
   const [editing, setEditing] = useState(null)
@@ -198,7 +200,13 @@ function Products() {
     try { await uploadImage('products', id, file); reload() } catch (e) { setRowError(e.message) }
   }
   const remove = async (p) => {
-    if (!confirm(`წავშალო „${p.name}“? ეს ვერ დაბრუნდება.`)) return
+    const ok = await confirm({
+      title: `წავშალო „${p.name}“?`,
+      message: 'პროდუქტი წაიშლება ფოტოსთან და მყიდველების მოთხოვნებთან ერთად. ამის დაბრუნება ვეღარ მოხერხდება.',
+      confirmLabel: 'წაშლა',
+      danger: true,
+    })
+    if (!ok) return
     setRowError(null)
     try {
       await api(`/admin/products/${p.id}`, { method: 'DELETE' })
@@ -264,9 +272,17 @@ function Staff() {
 }
 
 function Deals() {
+  const confirm = useConfirm()
   const [deals, error, reload] = useLoad(() => api('/admin/deals'), [])
   const cancel = async (d) => {
-    if (!confirm(`გავაუქმო „${d.productName}“? ყველა ჯავშანი გაუქმდება და მყიდველები SMS-ს მიიღებენ.`)) return
+    const ok = await confirm({
+      title: `გავაუქმო „${d.productName}“-ის შეთავაზება?`,
+      message: 'ყველა ჯავშანი გაუქმდება და მყიდველები SMS-ს მიიღებენ. ამის დაბრუნება ვეღარ მოხერხდება.',
+      confirmLabel: 'შეთავაზების გაუქმება',
+      cancelLabel: 'უკან',
+      danger: true,
+    })
+    if (!ok) return
     await api(`/admin/deals/${d.id}/cancel`, { method: 'POST' })
     reload()
   }

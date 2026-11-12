@@ -56,8 +56,9 @@ export default function StoreNewDeal() {
   }
 
   const publishDraft = async (id) => {
-    try { await api(`/store/deals/${id}/publish`, { method: 'POST' }); reloadDeals() }
-    catch (e) { alert(e.message) }
+    setFormError(null); setMsg(null)
+    try { await api(`/store/deals/${id}/publish`, { method: 'POST' }); setMsg({ text: 'შეთავაზება გამოქვეყნდა!' }); reloadDeals() }
+    catch (e) { setFormError(e.message) }
   }
 
   return (

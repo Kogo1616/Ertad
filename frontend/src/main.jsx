@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './auth'
+import { ConfirmProvider } from './components/ConfirmDialog'
 import { RequireBuyer, SiteLayout, StoreLayout } from './components/Layouts'
 import DealsPage from './pages/DealsPage'
 import StoresPage from './pages/StoresPage'
@@ -23,6 +24,7 @@ import './styles.css'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
+    <ConfirmProvider>
       <BrowserRouter>
         <Routes>
           <Route element={<SiteLayout />}>
@@ -49,6 +51,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="*" element={<Navigate to="/deals" replace />} />
         </Routes>
       </BrowserRouter>
+    </ConfirmProvider>
     </AuthProvider>
   </StrictMode>,
 )

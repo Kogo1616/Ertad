@@ -307,3 +307,19 @@ tr:last-child td { border-bottom: 0; }
 .theme-toggle, .icon-btn { width: 40px; height: 40px; flex: none; border: 1px solid var(--border); border-radius: 50%; background: transparent; color: var(--ink); display: inline-flex; align-items: center; justify-content: center; }
 .theme-toggle:hover, .icon-btn:hover { background: var(--surface-2); }
 .sidebar .theme-toggle { align-self: flex-start; margin-top: 10px; }
+
+/* confirm dialog (components/ConfirmDialog.jsx) */
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover:not(:disabled) { background: var(--danger); color: #fff; filter: brightness(1.1); }
+:root:not([data-theme="light"]) .btn-danger { color: #2A0A0A; }
+:root:not([data-theme="light"]) .btn-danger:hover:not(:disabled) { color: #2A0A0A; }
+.dialog { padding: 0; border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--surface); color: var(--ink); width: min(440px, calc(100vw - 32px)); }
+.dialog::backdrop { background: rgba(5, 7, 10, .6); backdrop-filter: blur(3px); }
+.dialog[open] { animation: dialog-in .16s ease-out; }
+@keyframes dialog-in { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .dialog[open] { animation: none; } }
+.dialog-body { padding: 24px; display: flex; flex-direction: column; gap: 12px; }
+.dialog-icon { width: 44px; height: 44px; border-radius: 50%; background: var(--danger-soft); color: var(--danger); display: flex; align-items: center; justify-content: center; margin-bottom: 4px; }
+.dialog-title { font-size: 20px; }
+.dialog-message { color: var(--muted); font-size: 15px; line-height: 1.5; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 12px; flex-wrap: wrap; }

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api'
 import { CheckIcon, CopyButton, ErrorBox, Loading, Progress, useLoad, useSecondsLeft } from '../components/ui'
+import { useConfirm } from '../components/ConfirmDialog'
 import { money, when } from '../format'
 
 function Confetti() {
@@ -34,6 +35,7 @@ export default function ReservationPage() {
   const [r, loadError, reload] = useLoad(() => api('/my/reservations/' + id), [id])
   const [error, setError] = useState(null)
   const [busy, setBusy] = useState(false)
+  const confirm = useConfirm()
   const [smsNote, setSmsNote] = useState(null)
   const [resendAt, setResendAt] = useState(null)
   const resendIn = useSecondsLeft(resendAt)
@@ -43,7 +45,16 @@ export default function ReservationPage() {
   const { deal } = r
 
   const cancel = async () => {
-    if (!confirm('ნამდვილად გინდა ჯავშნის გაუქმება?')) return
+    const ok = await confirm({
+      title: 'გააუქმო ჯავშანი?',
+      message: r.status === 'Waitlisted'
+        ? 'მოლოდინის სიიდან გახვალ.'
+        : 'ადგილი სხვა მყიდველს გადაეცემა. თავიდან დაჯავშნა მხოლოდ თავისუფალი ადგილის შემთხვევაში შეიძლება.',
+      confirmLabel: 'ჯავშნის გაუქმება',
+      cancelLabel: 'დატოვება',
+      danger: true,
+    })
+    if (!ok) return
     setBusy(true); setError(null)
     try { await api(`/my/reservations/${r.id}/cancel`, { method: 'POST' }); reload() }
     catch (e) { setError(e.message) } finally { setBusy(false) }
