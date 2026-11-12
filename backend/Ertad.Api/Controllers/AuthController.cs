@@ -41,7 +41,7 @@ public class AuthController(AppDbContext db, ISmsSender sms, IWebHostEnvironment
         await db.SaveChangesAsync();
         try
         {
-            await sms.SendAsync(phone, $"ერთად: შენი კოდია {code}");
+            await sms.SendAsync(phone, $"ერთად: შენი კოდია {code}", otp: true);
         }
         catch (SmsException)
         {

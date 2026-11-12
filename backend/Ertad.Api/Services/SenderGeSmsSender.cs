@@ -21,7 +21,7 @@ public class SenderGeSmsSender(HttpClient http, SenderGeOptions options, ILogger
 {
     public const string Endpoint = "https://sender.ge/api/send.php";
 
-    public async Task SendAsync(string phone, string body)
+    public async Task SendAsync(string phone, string body, bool otp = false)
     {
         // sender.ge wants the 9-digit national number, e.g. 555123456.
         if (!phone.StartsWith("+995") || phone.Length != 13)

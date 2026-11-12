@@ -48,7 +48,7 @@ Where the spec was ambiguous or the request changed it, we took the simplest opt
 - All colors live as CSS custom properties in `styles.css`. Components use tokens only, no hex values, except purely decorative SVG.
 
 ## SMS
-- **Provider: sender.ge**, chosen as the cheapest documented Georgian API at about 0.01 ₾ per part. ubill.ge has a similar price, but its public API docs were incomplete. Twilio-type international providers cost about $0.10+ per SMS to Georgia. `SenderGeSmsSender` posts to `https://sender.ge/api/send.php` with the 9-digit national number. `Dev` stays the default provider.
+- **Providers: ubill.ge (recommended) and sender.ge.** Both cost about 0.01 ₾ per SMS. ubill has no minimum package, documents its API fully and has an `otp` priority flag for login codes, but it needs a registered sender brand. sender.ge was first chosen as the cheapest documented Georgian API at about 0.01 ₾ per part. ubill.ge has a similar price, but its public API docs were incomplete. Twilio-type international providers cost about $0.10+ per SMS to Georgia. `SenderGeSmsSender` posts to `https://sender.ge/api/send.php` with the 9-digit national number. `Dev` stays the default provider.
 - **Transliteration on by default:** Georgian text is converted to Latin before sending (GSM-7, 160 chars per part, vs UCS-2 at 70). A typical notification drops from 3 parts to 1–2.
 - **`smsno=2` (informational)** for all messages. They are codes and deal updates the buyer asked for, not advertising.
 - **A failed SMS after a committed change is logged, not rolled back.** For example, a deal still activates even if one buyer's SMS fails; the code is always on the reservation page. Only the login code and the manual pickup-code resend report the failure to the user.

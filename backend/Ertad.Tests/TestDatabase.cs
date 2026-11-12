@@ -68,7 +68,7 @@ public class DbCollection : ICollectionFixture<PostgresFixture>;
 
 public class NullSms : ISmsSender
 {
-    public Task SendAsync(string phone, string body) => Task.CompletedTask;
+    public Task SendAsync(string phone, string body, bool otp = false) => Task.CompletedTask;
 }
 
 /// <summary>Builders for test data.</summary>

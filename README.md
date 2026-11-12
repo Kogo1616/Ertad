@@ -43,9 +43,25 @@ Open http://localhost:5173.
 
 The seeded buyers are `+995 555 00 00 01` … `+995 555 00 00 30`. You can log in as any of them with OTP.
 
-## Real SMS (sender.ge)
+## Real SMS
 
-By default SMS go to the API console (`Sms:Provider = Dev`), and the login page shows the code. To send real SMS:
+By default SMS go to the API console (`Sms:Provider = Dev`), and the login page shows the code. Two real providers are built in.
+
+### ubill.ge (recommended, cheapest: 0.01 ₾ per SMS, no minimum package)
+
+1. Create an account at [ubill.ge](https://ubill.ge), top up the SMS balance, and register a sender name (brand, e.g. `Ertad`). Wait until ubill approves it.
+2. Copy the API key from the company settings and the brand's numeric ID.
+3. Start the API:
+
+```powershell
+$env:Sms__Provider="Ubill"; $env:Sms__Ubill__ApiKey="YOUR_KEY"; $env:Sms__Ubill__BrandId="YOUR_BRAND_ID"; dotnet run --launch-profile http
+```
+
+Login codes are sent with ubill's `otp` flag, which gives them top priority. Text is transliterated to Latin by default (`Sms:Ubill:Transliterate`).
+
+### sender.ge
+
+To send real SMS through sender.ge instead:
 
 1. Create an account at [sender.ge](https://sender.ge), top up the balance (about 0.01 ₾ per SMS part), and copy your API key.
 2. Start the API with the provider and key set as environment variables. Keep the key out of git:

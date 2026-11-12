@@ -6,13 +6,14 @@ namespace Ertad.Api.Services;
 
 public interface ISmsSender
 {
-    Task SendAsync(string phone, string body);
+    /// <param name="otp">True for login codes: providers that support it deliver these with top priority.</param>
+    Task SendAsync(string phone, string body, bool otp = false);
 }
 
 /// <summary>Dev SMS: writes to the console. Every message is also stored in NotificationLog.</summary>
 public class DevSmsSender(ILogger<DevSmsSender> log) : ISmsSender
 {
-    public Task SendAsync(string phone, string body)
+    public Task SendAsync(string phone, string body, bool otp = false)
     {
         log.LogWarning("SMS to {Phone}: {Body}", phone, body);
         return Task.CompletedTask;
