@@ -51,7 +51,7 @@ The database starts empty apart from the admin account.
 4. **„თანამშრომლები“:** create the store's login (email, password of at least 8 characters, role „მაღაზიის თანამშრომელი“, the store).
 5. The store logs in at `/staff/login` and publishes group deals from its panel (`/store`).
 
-Stores and products can't be deleted, only switched off: untick „აქტიური“ and save, so past deals and reports stay intact.
+Required fields are marked with *. A product that never had a deal can be deleted („წაშლა“ in its row). A product with deals, and any store, can only be switched off: untick „აქტიური“ and save, so past deals and reports stay intact.
 
 ## Real SMS
 

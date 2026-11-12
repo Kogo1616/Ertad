@@ -93,20 +93,24 @@ function RowImage({ imageUrl, onFile }) {
   )
 }
 
-/** Generic inline form helper: fields = [[key, label, type]] */
-function SimpleForm({ fields, initial, onSubmit, submitLabel = 'შენახვა' }) {
+/** Generic inline form helper: fields = [[key, label, type, options]]; `required` = keys that must be filled. */
+function SimpleForm({ fields, initial, onSubmit, submitLabel = 'შენახვა', required = [] }) {
   const [v, setV] = useState(initial)
   const [error, setError] = useState(null)
+  const [busy, setBusy] = useState(false)
   const submit = async (e) => {
     e.preventDefault()
-    setError(null)
-    try { await onSubmit(v); setV(initial) } catch (err) { setError(err.message) }
+    const missing = fields.find(([k, , type]) => required.includes(k) && (type === 'number' ? !(Number(v[k]) > 0) : !String(v[k] ?? '').trim()))
+    if (missing) { setError(`შეავსე სავალდებულო ველი: ${missing[1]}`); return }
+    setError(null); setBusy(true)
+    try { await onSubmit(v); setV(initial) } catch (err) { setError(err.message) } finally { setBusy(false) }
   }
   return (
-    <form className="card" style={{ gap: 12 }} onSubmit={submit}>
+    <form className="card" style={{ gap: 12 }} onSubmit={submit} noValidate>
       <div className="form-grid">
         {fields.map(([k, label, type, options]) => (
-          <label key={k} className={'field' + (type === 'image' ? ' field-full' : '')} htmlFor={'f-' + k}>{label}
+          <label key={k} className={'field' + (type === 'image' ? ' field-full' : '')} htmlFor={'f-' + k}>
+            <span>{label}{required.includes(k) && <span style={{ color: 'var(--danger)' }} aria-label="სავალდებულო"> *</span>}</span>
             {type === 'select' ? (
               <select id={'f-' + k} className="input" value={v[k] ?? ''} onChange={(e) => setV({ ...v, [k]: e.target.value })}>
                 {options.map(([val, text]) => <option key={val} value={val}>{text}</option>)}
@@ -119,13 +123,18 @@ function SimpleForm({ fields, initial, onSubmit, submitLabel = 'შენახ�
                 {v[k] ? 'დიახ' : 'არა'}
               </span>
             ) : (
-              <input id={'f-' + k} className="input" type={type || 'text'} value={v[k] ?? ''} onChange={(e) => setV({ ...v, [k]: e.target.value })} />
+              <input id={'f-' + k} className="input" type={type || 'text'} value={v[k] ?? ''} required={required.includes(k)}
+                aria-required={required.includes(k)} min={type === 'number' ? 0 : undefined} step={type === 'number' ? 'any' : undefined}
+                onChange={(e) => setV({ ...v, [k]: e.target.value })} />
             )}
           </label>
         ))}
       </div>
       <ErrorBox error={error} />
-      <button className="btn" style={{ alignSelf: 'flex-start' }}>{submitLabel}</button>
+      <div className="row" style={{ gap: 12 }}>
+        <button className="btn" disabled={busy}>{submitLabel}</button>
+        {required.length > 0 && <span className="small muted"><span style={{ color: 'var(--danger)' }}>*</span> სავალდებულო ველი</span>}
+      </div>
     </form>
   )
 }
@@ -159,7 +168,7 @@ function Stores() {
         </table>
       </div>
       <h2>{editing ? `რედაქტირება: ${editing.name}` : 'ახალი მაღაზია'}</h2>
-      <SimpleForm key={editing?.id ?? 'new'} fields={fields} onSubmit={save}
+      <SimpleForm key={editing?.id ?? 'new'} fields={fields} onSubmit={save} required={['name']}
         initial={editing ?? { name: '', city: 'ქუთაისი', address: '', mapUrl: '', commissionPerItem: 5, isActive: true }} />
     </section>
   )
@@ -188,6 +197,15 @@ function Products() {
     if (file.size > MAX_IMAGE_BYTES) { setRowError('ფაილი 5 MB-ზე დიდია'); return }
     try { await uploadImage('products', id, file); reload() } catch (e) { setRowError(e.message) }
   }
+  const remove = async (p) => {
+    if (!confirm(`წავშალო „${p.name}“? ეს ვერ დაბრუნდება.`)) return
+    setRowError(null)
+    try {
+      await api(`/admin/products/${p.id}`, { method: 'DELETE' })
+      if (editing?.id === p.id) setEditing(null)
+      reload()
+    } catch (e) { setRowError(e.message) }
+  }
   return (
     <section className="stack">
       <ErrorBox error={error ?? rowError} />
@@ -200,13 +218,18 @@ function Products() {
               <td><RowImage imageUrl={p.imageUrl} onFile={(f) => upload(p.id, f)} /></td>
               <td>{p.name}<div className="small muted">{p.description}</div></td>
               <td>{money(p.regularPrice)}</td><td>{p.isActive ? 'დიახ' : 'არა'}</td>
-              <td><button type="button" className="btn btn-sm btn-soft" onClick={() => setEditing(p)}>რედაქტირება</button></td>
+              <td>
+                <div className="row" style={{ gap: 8, flexWrap: 'nowrap' }}>
+                  <button type="button" className="btn btn-sm btn-soft" onClick={() => setEditing(p)}>რედაქტირება</button>
+                  <button type="button" className="btn btn-sm btn-ghost" style={{ color: 'var(--danger)' }} onClick={() => remove(p)} aria-label={`წაშლა: ${p.name}`}>წაშლა</button>
+                </div>
+              </td>
             </tr>
           ))}</tbody>
         </table>
       </div>
       <h2>{editing ? `რედაქტირება: ${editing.name}` : 'ახალი პროდუქტი'}</h2>
-      <SimpleForm key={editing?.id ?? 'new'} fields={fields} onSubmit={save}
+      <SimpleForm key={editing?.id ?? 'new'} fields={fields} onSubmit={save} required={['name', 'regularPrice']}
         initial={editing ?? { storeId: stores[0]?.id, name: '', description: '', regularPrice: '', isActive: true }} />
     </section>
   )
@@ -235,7 +258,7 @@ function Staff() {
         </table>
       </div>
       <h2>ახალი ანგარიში</h2>
-      <SimpleForm fields={fields} onSubmit={save} submitLabel="შექმნა" initial={{ email: '', password: '', role: 'StoreStaff', storeId: stores[0]?.id }} />
+      <SimpleForm fields={fields} onSubmit={save} submitLabel="შექმნა" required={['email', 'password']} initial={{ email: '', password: '', role: 'StoreStaff', storeId: stores[0]?.id }} />
     </section>
   )
 }

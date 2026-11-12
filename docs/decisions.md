@@ -56,4 +56,5 @@ Where the spec was ambiguous or the request changed it, we took the simplest opt
 
 ## Real data
 - **Demo seed is off by default (`Seed:Demo`).** On every start only an admin account is ensured (`Seed:AdminEmail` / `Seed:AdminPassword`), so a wiped database is usable right away. Integration tests turn the demo on.
-- **Stores and products are switched off, not deleted** (`IsActive`), because deals, reservations and commissions reference them.
+- **Stores are switched off, not deleted** (`IsActive`). **A product can be deleted only if it never had a deal** (draft included); its buyer requests and photo go with it. A product with deals is switched off instead, so reservations, sales and reports stay intact.
+- **Required fields:** store name; product name and a price above 0. Checked in the form and again on the server.

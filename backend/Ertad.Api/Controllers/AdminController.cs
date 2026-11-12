@@ -14,8 +14,8 @@ namespace Ertad.Api.Controllers;
 [Authorize(Roles = Roles.Admin)]
 public class AdminController(AppDbContext db, DealService deals, IWebHostEnvironment env) : ControllerBase
 {
-    public record StoreInput(string Name, string City, string Address, string MapUrl, decimal CommissionPerItem, bool IsActive);
-    public record ProductInput(int StoreId, string Name, string Description, decimal RegularPrice, bool IsActive);
+    public record StoreInput(string? Name, string? City, string? Address, string? MapUrl, decimal CommissionPerItem, bool IsActive);
+    public record ProductInput(int StoreId, string? Name, string? Description, decimal RegularPrice, bool IsActive);
     public record StaffInput(string Email, string Password, StaffRole Role, int? StoreId);
 
     // ---- stores
@@ -25,6 +25,7 @@ public class AdminController(AppDbContext db, DealService deals, IWebHostEnviron
     [HttpPost("stores")]
     public async Task<IActionResult> CreateStore(StoreInput i)
     {
+        if (Validate(i) is { } error) return BadRequest(new { error });
         var s = new Store();
         Apply(s, i);
         db.Stores.Add(s);
@@ -35,6 +36,7 @@ public class AdminController(AppDbContext db, DealService deals, IWebHostEnviron
     [HttpPut("stores/{id:int}")]
     public async Task<IActionResult> UpdateStore(int id, StoreInput i)
     {
+        if (Validate(i) is { } error) return BadRequest(new { error });
         var s = await db.Stores.FindAsync(id);
         if (s == null) return NotFound();
         Apply(s, i);
@@ -42,9 +44,23 @@ public class AdminController(AppDbContext db, DealService deals, IWebHostEnviron
         return Ok(s);
     }
 
+    private const int MaxName = 100;
+
+    private static string? Validate(StoreInput i) =>
+        string.IsNullOrWhiteSpace(i.Name) ? "მაღაზიის სახელი სავალდებულოა"
+        : i.Name.Trim().Length > MaxName ? $"სახელი მაქსიმუმ {MaxName} სიმბოლო"
+        : i.CommissionPerItem < 0 ? "საკომისიო არ შეიძლება იყოს უარყოფითი"
+        : null;
+
+    private static string? Validate(ProductInput i) =>
+        string.IsNullOrWhiteSpace(i.Name) ? "პროდუქტის სახელი სავალდებულოა"
+        : i.Name.Trim().Length > MaxName ? $"სახელი მაქსიმუმ {MaxName} სიმბოლო"
+        : i.RegularPrice <= 0 ? "ფასი სავალდებულოა და 0-ზე მეტი უნდა იყოს"
+        : null;
+
     private static void Apply(Store s, StoreInput i)
     {
-        s.Name = i.Name.Trim(); s.City = i.City.Trim(); s.Address = i.Address.Trim(); s.MapUrl = i.MapUrl.Trim();
+        s.Name = i.Name!.Trim(); s.City = i.City?.Trim() ?? ""; s.Address = i.Address?.Trim() ?? ""; s.MapUrl = i.MapUrl?.Trim() ?? "";
         s.CommissionPerItem = i.CommissionPerItem; s.IsActive = i.IsActive;
     }
 
@@ -59,8 +75,9 @@ public class AdminController(AppDbContext db, DealService deals, IWebHostEnviron
     [HttpPost("products")]
     public async Task<IActionResult> CreateProduct(ProductInput i)
     {
+        if (Validate(i) is { } error) return BadRequest(new { error });
         if (!await db.Stores.AnyAsync(s => s.Id == i.StoreId)) return BadRequest(new { error = "მაღაზია ვერ მოიძებნა" });
-        var p = new StoreProduct { StoreId = i.StoreId, Name = i.Name.Trim(), Description = i.Description.Trim(), RegularPrice = i.RegularPrice, IsActive = i.IsActive };
+        var p = new StoreProduct { StoreId = i.StoreId, Name = i.Name!.Trim(), Description = i.Description?.Trim() ?? "", RegularPrice = i.RegularPrice, IsActive = i.IsActive };
         db.StoreProducts.Add(p);
         await db.SaveChangesAsync();
         return Ok(new { p.Id });
@@ -69,11 +86,33 @@ public class AdminController(AppDbContext db, DealService deals, IWebHostEnviron
     [HttpPut("products/{id:int}")]
     public async Task<IActionResult> UpdateProduct(int id, ProductInput i)
     {
+        if (Validate(i) is { } error) return BadRequest(new { error });
         var p = await db.StoreProducts.FindAsync(id);
         if (p == null) return NotFound();
-        p.Name = i.Name.Trim(); p.Description = i.Description.Trim(); p.RegularPrice = i.RegularPrice; p.IsActive = i.IsActive;
+        p.Name = i.Name!.Trim(); p.Description = i.Description?.Trim() ?? ""; p.RegularPrice = i.RegularPrice; p.IsActive = i.IsActive;
         await db.SaveChangesAsync();
         return Ok(new { p.Id });
+    }
+
+    /// <summary>
+    /// Deletes a product that never had a group deal (its buyer requests and photo go with it).
+    /// A product with deals is refused: its reservations, sales and reports must stay intact — deactivate it instead.
+    /// </summary>
+    [HttpDelete("products/{id:int}")]
+    public async Task<IActionResult> DeleteProduct(int id)
+    {
+        var p = await db.StoreProducts.FindAsync(id);
+        if (p == null) return NotFound();
+        if (await db.Deals.AnyAsync(d => d.StoreProductId == id))
+            return Conflict(new { error = "ამ პროდუქტზე შეთავაზება უკვე იყო, ამიტომ წაშლა არ შეიძლება — გამორთე („აქტიური“: არა)" });
+
+        await using var tx = await db.Database.BeginTransactionAsync();
+        await db.DiscountInterests.Where(x => x.StoreProductId == id).ExecuteDeleteAsync();
+        db.StoreProducts.Remove(p);
+        await db.SaveChangesAsync();
+        await tx.CommitAsync();
+        DeleteUpload(p.ImageUrl);
+        return Ok();
     }
 
     [HttpPost("products/{id:int}/image")]

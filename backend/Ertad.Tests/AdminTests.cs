@@ -11,6 +11,74 @@ public class AdminTests(PostgresFixture pg)
 {
     private record Created(int Id);
 
+    private async Task<(WebApplicationFactory<Program> Factory, HttpClient Admin, string Cs)> AdminClientAsync()
+    {
+        var cs = await pg.CreateDatabaseAsync();
+        var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(b =>
+        {
+            b.UseSetting("ConnectionStrings:Default", cs);
+            b.UseSetting("Jobs:Enabled", "false");
+        });
+        var admin = factory.CreateClient();
+        (await admin.PostAsJsonAsync("/api/auth/staff-login", new { email = "admin@ertad.ge", password = "Admin123!" })).EnsureSuccessStatusCode();
+        return (factory, admin, cs);
+    }
+
+    [Fact]
+    public async Task Names_and_price_are_required()
+    {
+        var (factory, admin, _) = await AdminClientAsync();
+        await using var _f = factory;
+
+        Assert.Equal(HttpStatusCode.BadRequest, (await admin.PostAsJsonAsync("/api/admin/stores", new { name = "  ", city = "ქუთაისი", commissionPerItem = 5, isActive = true })).StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, (await admin.PostAsJsonAsync("/api/admin/stores", new { city = "ქუთაისი", commissionPerItem = 5, isActive = true })).StatusCode);
+        var store = await (await admin.PostAsJsonAsync("/api/admin/stores", new { name = "მაღაზია", isActive = true, commissionPerItem = 5 })).Content.ReadFromJsonAsync<Created>();
+
+        Assert.Equal(HttpStatusCode.BadRequest, (await admin.PostAsJsonAsync("/api/admin/products", new { storeId = store!.Id, name = "", regularPrice = 10, isActive = true })).StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, (await admin.PostAsJsonAsync("/api/admin/products", new { storeId = store.Id, name = "ჩაიდანი", regularPrice = 0, isActive = true })).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await admin.PostAsJsonAsync("/api/admin/products", new { storeId = store.Id, name = "ჩაიდანი", regularPrice = 65, isActive = true })).StatusCode);
+    }
+
+    [Fact]
+    public async Task Product_without_deals_can_be_deleted_but_not_one_with_a_deal()
+    {
+        var (factory, admin, cs) = await AdminClientAsync();
+        await using var _f = factory;
+        var store = await (await admin.PostAsJsonAsync("/api/admin/stores", new { name = "მაღაზია", commissionPerItem = 5, isActive = true })).Content.ReadFromJsonAsync<Created>();
+        var free = await (await admin.PostAsJsonAsync("/api/admin/products", new { storeId = store!.Id, name = "ტოსტერი", regularPrice = 70, isActive = true })).Content.ReadFromJsonAsync<Created>();
+        var used = await (await admin.PostAsJsonAsync("/api/admin/products", new { storeId = store.Id, name = "ბლენდერი", regularPrice = 80, isActive = true })).Content.ReadFromJsonAsync<Created>();
+
+        // A buyer request on the deletable product goes with it.
+        await using (var db = PostgresFixture.NewContext(cs))
+        {
+            var user = new Ertad.Api.Domain.User { Phone = "+995599000777", PhoneVerifiedAt = DateTime.UtcNow };
+            db.Users.Add(user);
+            await db.SaveChangesAsync();
+            db.DiscountInterests.Add(new Ertad.Api.Domain.DiscountInterest { UserId = user.Id, StoreProductId = free!.Id, MaxPrice = 55 });
+            await db.SaveChangesAsync();
+        }
+
+        // The other product gets a (draft) deal from the store.
+        (await admin.PostAsJsonAsync("/api/admin/staff", new { email = "s@example.ge", password = "Shop12345", role = "StoreStaff", storeId = store.Id })).EnsureSuccessStatusCode();
+        var staff = factory.CreateClient();
+        (await staff.PostAsJsonAsync("/api/auth/staff-login", new { email = "s@example.ge", password = "Shop12345" })).EnsureSuccessStatusCode();
+        (await staff.PostAsJsonAsync("/api/store/deals", new
+        {
+            storeProductId = used!.Id, origin = "StoreInitiated", groupPrice = 60, minReservations = 5, maxStock = 10,
+            reservationDeadline = DateTime.UtcNow.AddDays(3), pickupDays = 3, warrantyTerms = "", publish = false,
+        })).EnsureSuccessStatusCode();
+
+        Assert.Equal(HttpStatusCode.OK, (await admin.DeleteAsync($"/api/admin/products/{free!.Id}")).StatusCode);
+        Assert.Equal(HttpStatusCode.Conflict, (await admin.DeleteAsync($"/api/admin/products/{used.Id}")).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await admin.DeleteAsync($"/api/admin/products/{free.Id}")).StatusCode);
+
+        var list = await admin.GetStringAsync("/api/admin/products");
+        Assert.DoesNotContain("ტოსტერი", list);
+        Assert.Contains("ბლენდერი", list);
+        await using (var db = PostgresFixture.NewContext(cs))
+            Assert.Equal(0, db.DiscountInterests.Count());
+    }
+
     [Fact]
     public async Task Admin_can_set_up_a_store_from_an_empty_database()
     {
