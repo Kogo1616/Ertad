@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api'
-import { CheckIcon, CopyButton, ErrorBox, Loading, Progress, useLoad } from '../components/ui'
+import { CheckIcon, CopyButton, ErrorBox, Loading, Progress, useLoad, useSecondsLeft } from '../components/ui'
 import { money, when } from '../format'
 
 function Confetti() {
@@ -34,6 +34,9 @@ export default function ReservationPage() {
   const [r, loadError, reload] = useLoad(() => api('/my/reservations/' + id), [id])
   const [error, setError] = useState(null)
   const [busy, setBusy] = useState(false)
+  const [smsNote, setSmsNote] = useState(null)
+  const [resendAt, setResendAt] = useState(null)
+  const resendIn = useSecondsLeft(resendAt)
 
   if (loadError) return <main className="page"><ErrorBox error={loadError} /></main>
   if (!r) return <main className="page"><Loading /></main>
@@ -44,6 +47,17 @@ export default function ReservationPage() {
     setBusy(true); setError(null)
     try { await api(`/my/reservations/${r.id}/cancel`, { method: 'POST' }); reload() }
     catch (e) { setError(e.message) } finally { setBusy(false) }
+  }
+  const resendCode = async () => {
+    setBusy(true); setError(null); setSmsNote(null)
+    try {
+      const res = await api(`/my/reservations/${r.id}/resend-code`, { method: 'POST' })
+      setResendAt(Date.now() + res.resendIn * 1000)
+      setSmsNote(res.remaining > 0 ? `კოდი SMS-ით გაიგზავნა (კიდევ ${res.remaining}-ჯერ შეიძლება)` : 'კოდი SMS-ით გაიგზავნა')
+    } catch (e) {
+      setError(e.message)
+      if (e.data?.resendIn) setResendAt(Date.now() + e.data.resendIn * 1000)
+    } finally { setBusy(false) }
   }
   const answer = async (pickedUp) => {
     await api(`/my/reservations/${r.id}/pickup-answer`, { method: 'POST', body: { pickedUp } })
@@ -67,6 +81,10 @@ export default function ReservationPage() {
                 {r.code.split('').map((c, i) => <span key={i} aria-hidden="true">{c}</span>)}
               </div>
               <span className="muted" style={{ fontSize: 14 }}>აჩვენე მაღაზიაში გადახდისას</span>
+              <button type="button" className="btn btn-ghost btn-sm" disabled={busy || resendIn > 0} onClick={resendCode}>
+                {resendIn > 0 ? `თავიდან გაგზავნა ${resendIn} წამში` : 'კოდი SMS-ით გამომიგზავნე'}
+              </button>
+              {smsNote && <span className="small" role="status" style={{ color: 'var(--accent-ink)' }}>{smsNote}</span>}
             </div>
             <div className="ticket-right">
               <div className="kv"><span>პროდუქტი</span><strong>{deal.productName}</strong></div>

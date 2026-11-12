@@ -7,7 +7,19 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<AppDbContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
-builder.Services.AddSingleton<ISmsSender, DevSmsSender>();
+// SMS: "Dev" logs to the console (default); "SenderGe" sends real SMS through sender.ge.
+if (builder.Configuration["Sms:Provider"] == "SenderGe")
+{
+    var senderGe = builder.Configuration.GetSection("Sms:SenderGe").Get<SenderGeOptions>() ?? new();
+    if (string.IsNullOrWhiteSpace(senderGe.ApiKey))
+        throw new InvalidOperationException("Sms:SenderGe:ApiKey is required when Sms:Provider is SenderGe");
+    builder.Services.AddSingleton(senderGe);
+    builder.Services.AddHttpClient<ISmsSender, SenderGeSmsSender>(c => c.Timeout = TimeSpan.FromSeconds(15));
+}
+else
+{
+    builder.Services.AddSingleton<ISmsSender, DevSmsSender>();
+}
 builder.Services.AddScoped<Notifier>();
 builder.Services.AddScoped<DealService>();
 if (builder.Configuration.GetValue("Jobs:Enabled", true))

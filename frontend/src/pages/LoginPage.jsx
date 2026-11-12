@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
 import { useAuth } from '../auth'
-import { ErrorBox } from '../components/ui'
+import { ErrorBox, useSecondsLeft } from '../components/ui'
 
 /** Buyer login: phone → SMS code. */
 export default function LoginPage() {
@@ -17,16 +17,24 @@ export default function LoginPage() {
   const [devCode, setDevCode] = useState(null)
   const [error, setError] = useState(null)
   const [busy, setBusy] = useState(false)
+  const [notice, setNotice] = useState(null)
+  const [resendAt, setResendAt] = useState(null)
+  const resendIn = useSecondsLeft(resendAt)
 
-  const sendCode = async (e) => {
-    e.preventDefault()
-    setBusy(true); setError(null)
+  const requestCode = async () => {
+    setBusy(true); setError(null); setNotice(null)
     try {
       const r = await api('/auth/otp', { method: 'POST', body: { phone } })
       setDevCode(r.devCode)
+      setResendAt(Date.now() + r.resendIn * 1000)
+      if (step === 'code') { setCode(''); setNotice('ახალი კოდი გაიგზავნა') }
       setStep('code')
-    } catch (err) { setError(err.message) } finally { setBusy(false) }
+    } catch (err) {
+      setError(err.message)
+      if (err.data?.resendIn) setResendAt(Date.now() + err.data.resendIn * 1000)
+    } finally { setBusy(false) }
   }
+  const sendCode = (e) => { e.preventDefault(); requestCode() }
 
   const verify = async (e) => {
     e.preventDefault()
@@ -62,7 +70,11 @@ export default function LoginPage() {
               <input id="name" className="input" value={name} onChange={(e) => setName(e.target.value)} />
             </label>
             <ErrorBox error={error} />
+            {notice && <div className="note" role="status">{notice}</div>}
             <button className="btn btn-lg" disabled={busy}>შესვლა</button>
+            <button type="button" className="btn btn-ghost" disabled={busy || resendIn > 0} onClick={requestCode} aria-live="polite">
+              {resendIn > 0 ? `კოდი თავიდან გამოგზავნა შეიძლება ${resendIn} წამში` : 'კოდი არ მოვიდა? თავიდან გამომიგზავნე'}
+            </button>
           </form>
         )}
         <span className="small muted">მაღაზიის თანამშრომელი ხარ? <Link to="/staff/login">შესვლა პანელში</Link></span>

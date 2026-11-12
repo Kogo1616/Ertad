@@ -11,9 +11,48 @@ namespace Ertad.Api.Controllers;
 [ApiController]
 [Route("api/my")]
 [Authorize(Roles = Roles.Buyer)]
-public class MyController(AppDbContext db, DealService deals) : ControllerBase
+public class MyController(AppDbContext db, DealService deals, ISmsSender sms) : ControllerBase
 {
     public record PickupAnswer(bool PickedUp);
+
+    private const int MaxCodeResends = 3;
+    private static readonly TimeSpan CodeResendCooldown = TimeSpan.FromSeconds(60);
+
+    /// <summary>Sends the buyer's pickup code again by SMS (limited, each SMS costs money).</summary>
+    [HttpPost("reservations/{id:int}/resend-code")]
+    public async Task<IActionResult> ResendCode(int id)
+    {
+        var userId = User.Id();
+        var r = await db.Reservations.AsNoTracking()
+            .Include(x => x.PickupCode).Include(x => x.User)
+            .Include(x => x.Deal).ThenInclude(d => d.StoreProduct).ThenInclude(p => p.Store)
+            .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
+        if (r == null) return NotFound();
+        var code = r.PickupCode;
+        if (r.Status != ReservationStatus.Confirmed || code == null || code.RedeemedAt != null || code.ExpiresAt <= DateTime.UtcNow)
+            return BadRequest(new { error = "მოქმედი გატანის კოდი არ გაქვს" });
+
+        var sent = await db.NotificationLogs
+            .Where(n => n.UserId == userId && n.DealId == r.DealId && n.Type == "CodeResent")
+            .Select(n => n.SentAt).ToListAsync();
+        if (sent.Count >= MaxCodeResends)
+            return BadRequest(new { error = "კოდი უკვე რამდენჯერმე გამოგიგზავნეთ — ის ამ გვერდზეც ჩანს" });
+        var since = DateTime.UtcNow - (sent.Count > 0 ? sent.Max() : DateTime.MinValue);
+        if (since < CodeResendCooldown)
+        {
+            var wait = (int)Math.Ceiling((CodeResendCooldown - since).TotalSeconds);
+            return BadRequest(new { error = $"თავიდან გაგზავნა {wait} წამში შეიძლება", resendIn = wait });
+        }
+
+        var body = $"ერთად: გატანის კოდი {code.Code} — {r.Deal.StoreProduct.Name}, {Format.Money(r.Deal.GroupPrice)}. " +
+                   $"გაიტანე {Format.Date(code.ExpiresAt)}-მდე, {r.Deal.StoreProduct.Store.Address}.";
+        try { await sms.SendAsync(r.User.Phone, body); }
+        catch (SmsException) { return StatusCode(502, new { error = "SMS ვერ გაიგზავნა, სცადე ცოტა ხანში" }); }
+
+        db.NotificationLogs.Add(new NotificationLog { UserId = userId, Type = "CodeResent", DealId = r.DealId, Body = body });
+        await db.SaveChangesAsync();
+        return Ok(new { remaining = MaxCodeResends - sent.Count - 1, resendIn = (int)CodeResendCooldown.TotalSeconds });
+    }
 
     [HttpGet]
     public async Task<IActionResult> Overview()

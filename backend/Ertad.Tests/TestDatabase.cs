@@ -3,6 +3,7 @@ using Ertad.Api.Domain;
 using Ertad.Api.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging.Abstractions;
 using Npgsql;
 using Testcontainers.PostgreSql;
 
@@ -74,7 +75,7 @@ public class NullSms : ISmsSender
 public static class TestData
 {
     public static DealService Service(AppDbContext db) =>
-        new(db, new Notifier(db, new NullSms()), new ConfigurationBuilder().Build());
+        new(db, new Notifier(db, new NullSms(), NullLogger<Notifier>.Instance), new ConfigurationBuilder().Build());
 
     public record World(int StoreId, int ProductId, int DealId, List<int> UserIds);
 

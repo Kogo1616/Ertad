@@ -23,7 +23,7 @@ public class DevSmsSender(ILogger<DevSmsSender> log) : ISmsSender
 /// Queues notifications inside the current DbContext (so they commit together with the
 /// business change) and sends the SMS after the transaction commits.
 /// </summary>
-public class Notifier(AppDbContext db, ISmsSender sms)
+public class Notifier(AppDbContext db, ISmsSender sms, ILogger<Notifier> log)
 {
     private readonly List<(int UserId, string Body)> _pending = [];
 
@@ -39,8 +39,12 @@ public class Notifier(AppDbContext db, ISmsSender sms)
         var ids = _pending.Select(p => p.UserId).Distinct().ToList();
         var phones = await db.Users.Where(u => ids.Contains(u.Id)).ToDictionaryAsync(u => u.Id, u => u.Phone);
         foreach (var (userId, body) in _pending)
-            if (phones.TryGetValue(userId, out var phone))
-                await sms.SendAsync(phone, body);
+        {
+            if (!phones.TryGetValue(userId, out var phone)) continue;
+            // The business change is already committed: a failed SMS is logged, never rolled back.
+            try { await sms.SendAsync(phone, body); }
+            catch (Exception ex) { log.LogError(ex, "SMS to user {UserId} failed", userId); }
+        }
         _pending.Clear();
     }
 }

@@ -156,6 +156,17 @@ export const SearchIcon = () => (
   <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" /></svg>
 )
 
+/** Seconds left until `until` (ms timestamp), ticking every second; 0 when passed. */
+export function useSecondsLeft(until) {
+  const [, tick] = useState(0)
+  useEffect(() => {
+    if (!until || until <= Date.now()) return
+    const t = setInterval(() => tick((x) => x + 1), 1000)
+    return () => clearInterval(t)
+  }, [until])
+  return until ? Math.max(0, Math.ceil((until - Date.now()) / 1000)) : 0
+}
+
 /** Small hook: load data from the API; returns [data, error, reload]. */
 export function useLoad(fn, deps) {
   const [state, setState] = useState({ data: null, error: null })

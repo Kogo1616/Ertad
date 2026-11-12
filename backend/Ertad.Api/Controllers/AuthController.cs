@@ -25,17 +25,36 @@ public class AuthController(AppDbContext db, ISmsSender sms, IWebHostEnvironment
         var phone = Format.NormalizePhone(req.Phone);
         if (phone == null) return BadRequest(new { error = "ტელეფონის ნომერი არასწორია" });
 
-        var recent = await db.OtpCodes.CountAsync(o => o.Phone == phone && o.ExpiresAt > DateTime.UtcNow.AddMinutes(-5));
+        var now = DateTime.UtcNow;
+        // Codes live 5 minutes, so ExpiresAt - 5 min is when each was sent.
+        var lastSent = await db.OtpCodes.Where(o => o.Phone == phone).MaxAsync(o => (DateTime?)o.ExpiresAt) is { } exp ? exp.AddMinutes(-OtpMinutes) : (DateTime?)null;
+        if (lastSent != null && now - lastSent < ResendCooldown)
+        {
+            var wait = (int)Math.Ceiling((ResendCooldown - (now - lastSent.Value)).TotalSeconds);
+            return BadRequest(new { error = $"ახალი კოდი {wait} წამში შეგიძლია მოითხოვო", resendIn = wait });
+        }
+        var recent = await db.OtpCodes.CountAsync(o => o.Phone == phone && o.ExpiresAt > now.AddMinutes(-5));
         if (recent >= 5) return BadRequest(new { error = "ძალიან ბევრი მცდელობა, სცადე მოგვიანებით" });
 
         var code = RandomNumberGenerator.GetInt32(0, 1_000_000).ToString("D6");
-        db.OtpCodes.Add(new OtpCode { Phone = phone, Code = code, ExpiresAt = DateTime.UtcNow.AddMinutes(5) });
+        db.OtpCodes.Add(new OtpCode { Phone = phone, Code = code, ExpiresAt = now.AddMinutes(OtpMinutes) });
         await db.SaveChangesAsync();
-        await sms.SendAsync(phone, $"ერთად: შენი კოდია {code}");
+        try
+        {
+            await sms.SendAsync(phone, $"ერთად: შენი კოდია {code}");
+        }
+        catch (SmsException)
+        {
+            return StatusCode(502, new { error = "SMS ვერ გაიგზავნა, სცადე ცოტა ხანში" });
+        }
 
-        // In development the code is returned so you can log in without a real SMS gateway.
-        return Ok(new { phone, devCode = env.IsDevelopment() ? code : null });
+        // Without a real SMS gateway (dev), the code is returned so you can still log in.
+        var devCode = sms is DevSmsSender && env.IsDevelopment() ? code : null;
+        return Ok(new { phone, devCode, resendIn = (int)ResendCooldown.TotalSeconds });
     }
+
+    private const int OtpMinutes = 5;
+    private static readonly TimeSpan ResendCooldown = TimeSpan.FromSeconds(60);
 
     [HttpPost("verify")]
     public async Task<IActionResult> Verify(VerifyRequest req)

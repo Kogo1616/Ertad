@@ -43,6 +43,32 @@ Open http://localhost:5173.
 
 The seeded buyers are `+995 555 00 00 01` … `+995 555 00 00 30`. You can log in as any of them with OTP.
 
+## Real SMS (sender.ge)
+
+By default SMS go to the API console (`Sms:Provider = Dev`), and the login page shows the code. To send real SMS:
+
+1. Create an account at [sender.ge](https://sender.ge), top up the balance (about 0.01 ₾ per SMS part), and copy your API key.
+2. Start the API with the provider and key set as environment variables. Keep the key out of git:
+
+```bash
+Sms__Provider=SenderGe Sms__SenderGe__ApiKey=YOUR_KEY dotnet run --launch-profile http
+```
+
+PowerShell: `$env:Sms__Provider="SenderGe"; $env:Sms__SenderGe__ApiKey="YOUR_KEY"; dotnet run --launch-profile http`
+
+Settings (`appsettings.json` → `Sms:SenderGe`):
+
+| Setting | Default | Meaning |
+| --- | --- | --- |
+| `SmsNo` | `2` | 2 = informational (no opt-out text). 1 = advertising. |
+| `Transliterate` | `true` | Sends Georgian text in Latin letters ("ertad: sheni kodia 123456"). A Latin SMS part holds 160 characters, a Georgian one only 70, so this costs 2–3× less. |
+
+Only Georgian numbers (+995) can receive SMS through sender.ge. When the real provider is on, the login page no longer shows the code.
+
+**Resend limits** (each SMS costs money):
+- **Login code:** the next one can be sent 60 s after the last, and at most 5 codes go out in about 10 minutes.
+- **Pickup code:** the buyer can have it re-sent from the reservation page, at most 3 times, 60 s apart. The code is always visible on that page anyway.
+
 ## Seed data
 - One store, „[მაღაზია]“ in Kutaisi, with 12 household appliances.
 - 30 demo buyers. The blender has 18 interests; 12 of them give a price (3×≤50, 2×55, 7×60).
