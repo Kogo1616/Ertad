@@ -3,6 +3,7 @@ import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
 import { ClockIcon, ErrorBox, LiveTimeLeft, Loading, PhoneIcon, PinIcon, ProductImage, Progress, StoreLogo, useLoad } from '../components/ui'
 import { money } from '../format'
+import Select from '../components/Select'
 
 /** Catalog card. With a live group deal it sells the saving: group price vs crossed-out regular price. */
 export function ProductGrid({ products }) {
@@ -122,12 +123,7 @@ export default function StorePage() {
               <button key={key} type="button" className="filter" aria-pressed={filter === key} onClick={() => update('filter', key, 'all')}>{label}</button>
             ))}
           </div>
-          <label className="sort-select" htmlFor="sort">
-            <span className="sr-only">დალაგება</span>
-            <select id="sort" className="input" value={sort} onChange={(e) => update('sort', e.target.value, 'recommended')}>
-              {SORTS.map(([key, label]) => <option key={key} value={key}>{label}</option>)}
-            </select>
-          </label>
+          <Select label="დალაგება" value={sort} options={SORTS} onChange={(v) => update('sort', v, 'recommended')} />
         </div>
       </div>
       <p className="small muted" aria-live="polite">{products.length} პროდუქტი</p>

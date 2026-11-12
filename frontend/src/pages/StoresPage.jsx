@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
 import { ClockIcon, ErrorBox, Loading, PhoneIcon, PinIcon, StoreLogo, useLoad } from '../components/ui'
 import { ProductGrid } from './StorePage'
+import Select from '../components/Select'
 
 const SORTS = [
   ['recommended', 'რეკომენდებული'],
@@ -127,12 +128,7 @@ export default function StoresPage() {
           <button type="button" className="filter" aria-pressed={onlyDeals} onClick={() => set('deals', onlyDeals ? '' : '1')}>
             {onlyDeals ? '✓ ' : ''}მხოლოდ აქციებით
           </button>
-          <label className="sort-select" htmlFor="store-sort">
-            <span className="sr-only">დალაგება</span>
-            <select id="store-sort" className="input" value={sort} onChange={(e) => set('sort', e.target.value === 'recommended' ? '' : e.target.value)}>
-              {SORTS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
-            </select>
-          </label>
+          <Select label="დალაგება" value={sort} options={SORTS} onChange={(v) => set('sort', v === 'recommended' ? '' : v)} />
         </div>
 
         <ErrorBox error={error} />
