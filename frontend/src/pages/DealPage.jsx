@@ -3,7 +3,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
 import { isBuyer, useAuth } from '../auth'
 import { Countdown, CopyButton, ErrorBox, Loading, ProductImage, useLoad } from '../components/ui'
-import { money, tone, when } from '../format'
+import { money, when } from '../format'
 
 // How the buyer arrived here → reservation Source.
 const SRC = { list: 'DealsList', store: 'StorePage', sms: 'Notification' }
@@ -50,23 +50,22 @@ export default function DealPage() {
     <main className="page">
       <div className="split">
         <section className="hero">
-          <span className="dot" style={{ width: 260, height: 260, right: -60, top: -80 }} />
-          <span className="dot" style={{ width: 120, height: 120, right: 160, bottom: -60 }} />
-          <span className="hero-sticker" aria-label={`${deal.percentOff}% ფასდაკლება`}>−{deal.percentOff}%</span>
-          <div className="row" style={{ gap: 14, flexWrap: 'nowrap', paddingRight: 100 }}>
+          <div className="row" style={{ gap: 14, flexWrap: 'nowrap' }}>
             <div style={{ width: 64, flex: 'none' }}>
-              <ProductImage id={deal.productId} name={deal.productName} imageUrl={deal.imageUrl} height={64} radius={18} />
+              <ProductImage name={deal.productName} imageUrl={deal.imageUrl} height={64} />
             </div>
-            <div className="stack-sm" style={{ gap: 0 }}>
-              <span style={{ fontSize: 20, fontWeight: 800 }}>{deal.productName}</span>
-              <span style={{ fontSize: 14, color: '#E9E3FF' }}>{deal.storeName} · {deal.storeCity}</span>
+            <div className="stack-sm" style={{ gap: 0, flex: 1, minWidth: 0 }}>
+              <span className="eyebrow">{deal.origin === 'FromRequests' ? 'მყიდველების მოთხოვნით' : 'მაღაზიის შეთავაზება'}</span>
+              <h1 style={{ fontSize: 24 }}>{deal.productName}</h1>
+              <span className="small muted">{deal.storeName} · {deal.storeCity}</span>
             </div>
           </div>
           <div className="row" style={{ alignItems: 'baseline', gap: 14 }}>
             <span className="hero-price">{money(deal.groupPrice)}</span>
             <span className="hero-old">{money(deal.regularPrice)}</span>
+            <span className="chip" style={{ background: 'var(--accent)', color: 'var(--on-accent)', fontSize: 14 }} aria-label={`${deal.percentOff}% ფასდაკლება`}>−{deal.percentOff}%</span>
           </div>
-          <span style={{ fontSize: 16, color: '#F4F1FF' }}>
+          <span className="muted" style={{ fontSize: 15 }}>
             {deal.status === 'Activated'
               ? `ჯგუფი შეივსო! ფასი მოქმედებს — დარჩენილი ადგილები ${when(deal.deadline)}-მდე`
               : deal.status === 'Failed' ? 'ჯგუფი ვერ შეგროვდა, შეთავაზება დასრულდა'
@@ -76,18 +75,17 @@ export default function DealPage() {
           {live && <Countdown to={deal.deadline} />}
         </section>
 
-        <section className="card" style={{ flex: '2 1 360px', borderRadius: 32, padding: 28, gap: 18 }}>
+        <section className="card" style={{ flex: '2 1 360px', borderRadius: 'var(--r-lg)', padding: 24, gap: 18 }}>
           <div className="row between">
             <span style={{ fontSize: 20, fontWeight: 800 }}>ჯგუფი: {deal.confirmed} / {deal.min}</span>
-            {need > 0 && live && <span className="chip tone-peach" style={{ fontSize: 13 }}>კიდევ {need}!</span>}
-            {deal.status === 'Activated' && <span className="chip tone-mint" style={{ fontSize: 13 }}>შეივსო ✓</span>}
+            {need > 0 && live && <span className="chip tone-warning" style={{ fontSize: 13 }}>კიდევ {need}!</span>}
+            {deal.status === 'Activated' && <span className="chip tone-success" style={{ fontSize: 13 }}>შეივსო ✓</span>}
           </div>
           <div className="slots" aria-label={`${deal.confirmed} მონაწილე ${deal.min}-დან`}>
             {Array.from({ length: slotsCount }, (_, i) => {
               const initial = participants[i]
               if (!initial) return <span key={i} className="slot slot-empty" aria-hidden="true">+</span>
-              const [bg, fg] = tone(i + 2)
-              return <span key={i} className="slot" style={{ background: bg, color: fg }} aria-hidden="true">{initial}</span>
+              return <span key={i} className="slot slot-filled" aria-hidden="true">{initial}</span>
             })}
           </div>
 
@@ -106,22 +104,22 @@ export default function DealPage() {
             <label htmlFor="share" style={{ fontSize: 13, fontWeight: 700 }}>მოიწვიე მეგობარი — ყველას დააახლოებ ფასთან</label>
             <div className="row" style={{ gap: 8, flexWrap: 'nowrap' }}>
               <input id="share" className="input" style={{ fontSize: 14, fontWeight: 500 }} readOnly value={shareUrl} onFocus={(e) => e.target.select()} />
-              <CopyButton text={shareUrl} className="btn btn-sm" style={{ height: 48, background: 'var(--violet-soft)', color: 'var(--violet-ink)' }} />
+              <CopyButton text={shareUrl} className="btn btn-soft btn-sm" style={{ height: 46 }} />
             </div>
           </div>
         </section>
       </div>
 
       <section className="grid-auto" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))' }}>
-        <div className="tile tone-mint" style={{ gap: 4 }}>
-          <strong style={{ color: 'var(--mint-ink)' }}>წინასწარ 0 ₾</strong>
-          <span className="small">გადახდა მხოლოდ მაღაზიაში, ნივთის გატანისას</span>
+        <div className="tile tone-neutral" style={{ gap: 4 }}>
+          <strong style={{ color: 'var(--accent-ink)' }}>წინასწარ 0 ₾</strong>
+          <span className="small muted">გადახდა მხოლოდ მაღაზიაში, ნივთის გატანისას</span>
         </div>
-        <div className="tile tone-white" style={{ gap: 4 }}>
+        <div className="tile tone-neutral" style={{ gap: 4 }}>
           <strong>ვერ შეგროვდა?</strong>
           <span className="small muted">ჯავშანი ავტომატურად უქმდება, არაფერს კარგავ</span>
         </div>
-        <div className="tile tone-white" style={{ gap: 4 }}>
+        <div className="tile tone-neutral" style={{ gap: 4 }}>
           <strong>მარაგი: {Math.max(0, deal.maxStock - deal.confirmed)} / {deal.maxStock}</strong>
           <span className="small muted">გატანა {deal.pickupDays} დღეში{deal.warrantyTerms ? ' · ' + deal.warrantyTerms : ''}</span>
         </div>

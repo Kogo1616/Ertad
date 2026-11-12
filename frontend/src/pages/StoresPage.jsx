@@ -1,7 +1,6 @@
 import { Link, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
 import { ErrorBox, Loading, useLoad } from '../components/ui'
-import { tone } from '../format'
 import { ProductGrid } from './StorePage'
 
 export default function StoresPage() {
@@ -26,13 +25,13 @@ export default function StoresPage() {
         {!stores && !error && <Loading />}
         <div className="grid-auto">
           {stores?.map((s, i) => {
-            const [bg, fg] = tone(i + 4)
+            const [bg, fg] = ['var(--accent-soft)', 'var(--accent-ink)']
             return (
               <Link key={s.id} to={`/stores/${s.id}`} className="product-card" style={{ padding: 20 }}>
                 <span className="icon-square" style={{ background: bg, color: fg }}>{s.name.replace('[', '')[0]}</span>
                 <span style={{ fontSize: 17, fontWeight: 800 }}>{s.name}</span>
                 <span className="small muted">{s.city} · {s.address}</span>
-                <span className="small" style={{ color: 'var(--accent)', fontWeight: 700 }}>{s.productCount} პროდუქტი</span>
+                <span className="small" style={{ color: 'var(--accent-ink)', fontWeight: 700 }}>{s.productCount} პროდუქტი</span>
               </Link>
             )
           })}

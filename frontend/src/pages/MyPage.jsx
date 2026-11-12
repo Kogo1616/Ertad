@@ -38,7 +38,7 @@ export default function MyPage() {
               <strong>{i.productName}</strong>
               <span className="small muted">{i.storeName} · ჩვეულებრივ {money(i.regularPrice)} · სულ {i.interestCount} ითხოვს</span>
             </div>
-            <span className="chip tone-violet">{i.maxPrice != null ? `ჩემი ფასი: ${money(i.maxPrice)}` : 'ფასის გარეშე'}</span>
+            <span className="chip tone-accent">{i.maxPrice != null ? `ჩემი ფასი: ${money(i.maxPrice)}` : 'ფასის გარეშე'}</span>
           </Link>
         ))}
       </section>

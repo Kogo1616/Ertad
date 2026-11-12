@@ -5,21 +5,16 @@ import { money, timeLeft, tone } from '../format'
 export function Logo({ to = '/deals' }) {
   return (
     <Link to={to} className="logo" aria-label="ერთად — მთავარი">
-      <span className="logo-dots">
-        <span style={{ background: 'var(--violet)' }} />
-        <span style={{ background: 'var(--pink)' }} />
-        <span style={{ background: 'var(--mint)' }} />
-      </span>
+      <span className="logo-mark" aria-hidden="true"><span /><span /><span /></span>
       <span className="logo-text">ერთად</span>
     </Link>
   )
 }
 
-/** Product photo, or a pastel placeholder with the first letter. */
-export function ProductImage({ id, name, imageUrl, height = 170, radius, children }) {
-  const [bg] = tone(id)
+/** Product photo, or a neutral placeholder with the first letter. */
+export function ProductImage({ name, imageUrl, height = 170, radius, children }) {
   return (
-    <div className="pimg" style={{ height, background: bg, borderRadius: radius }}>
+    <div className="pimg" style={{ height, borderRadius: radius }}>
       {imageUrl ? <img src={imageUrl} alt={name} /> : <span className="pimg-letter" aria-hidden="true">{name?.[0]}</span>}
       {children}
     </div>
@@ -28,8 +23,8 @@ export function ProductImage({ id, name, imageUrl, height = 170, radius, childre
 
 export function OriginBadge({ origin }) {
   return origin === 'FromRequests'
-    ? <span className="chip pimg-badge" style={{ background: 'var(--violet)', color: '#fff' }}>მყიდველების მოთხოვნით</span>
-    : <span className="chip pimg-badge" style={{ background: 'var(--surface)', color: 'var(--peach-ink)' }}>მაღაზიის შეთავაზება</span>
+    ? <span className="chip pimg-badge badge-origin req">მყიდველების მოთხოვნით</span>
+    : <span className="chip pimg-badge badge-origin">მაღაზიის შეთავაზება</span>
 }
 
 export function Progress({ value, max }) {
@@ -45,7 +40,7 @@ export function Progress({ value, max }) {
 export function DealCard({ deal, to, isNew }) {
   const body = (
     <>
-      <ProductImage id={deal.productId} name={deal.productName} imageUrl={deal.imageUrl}>
+      <ProductImage name={deal.productName} imageUrl={deal.imageUrl}>
         <OriginBadge origin={deal.origin} />
         <span className="pimg-off">−{deal.percentOff}%</span>
       </ProductImage>
@@ -74,10 +69,10 @@ export function AvatarStack({ initials, total }) {
   return (
     <div className="avatars" aria-hidden="true">
       {initials.map((ch, i) => {
-        const [bg, fg] = tone(i + 2)
+        const [bg, fg] = tone(i)
         return <span key={i} className="avatar" style={{ background: bg, color: fg }}>{ch}</span>
       })}
-      {extra > 0 && <span className="avatar" style={{ background: 'var(--violet-soft)', color: 'var(--violet-ink)', fontSize: 12 }}>+{extra}</span>}
+      {extra > 0 && <span className="avatar" style={{ background: 'var(--surface-2)', color: 'var(--ink)', fontSize: 12 }}>+{extra}</span>}
     </div>
   )
 }
@@ -115,17 +110,17 @@ export function CopyButton({ text, label = 'კოპირება', className
 
 export function HowItWorks() {
   const steps = [
-    ['tone-violet', 'მოითხოვე ფასი', 'აირჩიე ნივთი და მიუთითე, რამდენს გადაიხდიდი'],
-    ['tone-butter', 'მაღაზია გთავაზობს', 'როცა ბევრი ვართ, მაღაზია ჯგუფურ ფასს აცხადებს'],
-    ['tone-mint', 'ჯგუფი ივსება', 'დაჯავშნე და მოიწვიე მეგობრები. წინასწარ არაფერს იხდი'],
-    ['tone-pink', 'გაიტანე მაღაზიიდან', 'აჩვენე კოდი და გადაიხადე ადგილზე'],
+    ['მოითხოვე ფასი', 'აირჩიე ნივთი და მიუთითე, რამდენს გადაიხდიდი'],
+    ['მაღაზია გთავაზობს', 'როცა ბევრი ვართ, მაღაზია ჯგუფურ ფასს აცხადებს'],
+    ['ჯგუფი ივსება', 'დაჯავშნე და მოიწვიე მეგობრები. წინასწარ არაფერს იხდი'],
+    ['გაიტანე მაღაზიიდან', 'აჩვენე კოდი და გადაიხადე ადგილზე'],
   ]
   return (
     <section className="stack" id="how">
       <h2>როგორ მუშაობს</h2>
       <div className="grid-auto">
-        {steps.map(([cls, title, text], i) => (
-          <div key={i} className={'how-step ' + cls}>
+        {steps.map(([title, text], i) => (
+          <div key={i} className="how-step">
             <span className="num">{i + 1}</span>
             <strong>{title}</strong>
             <span>{text}</span>
@@ -137,7 +132,7 @@ export function HowItWorks() {
 }
 
 export function StatusChip({ map, value }) {
-  const s = map[value] ?? { label: value, cls: 'tone-white' }
+  const s = map[value] ?? { label: value, cls: 'tone-neutral' }
   return <span className={'chip ' + s.cls}>{s.label}</span>
 }
 

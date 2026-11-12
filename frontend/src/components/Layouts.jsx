@@ -61,7 +61,7 @@ export function StoreLayout() {
         <NavLink to="/store/reports" className="side-link">ანგარიშები</NavLink>
         <div className="store-card">
           <span style={{ fontSize: 13, fontWeight: 700 }}>{me.storeName}</span>
-          <span style={{ fontSize: 12 }}>{me.storeCity} · პილოტი</span>
+          <span className="muted" style={{ fontSize: 12 }}>{me.storeCity} · პილოტი</span>
         </div>
         <button type="button" className="btn btn-white btn-sm" style={{ marginTop: 10 }} onClick={logout}>გასვლა</button>
         <ThemeToggle />

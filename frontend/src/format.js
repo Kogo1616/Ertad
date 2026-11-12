@@ -41,13 +41,13 @@ export function isoToTbilisiLocal(iso) {
   return d.toISOString().slice(0, 16)
 }
 
-// Pastel pairs [background, text] as CSS tokens, so they follow light/dark mode. All pass 4.5:1.
+// Soft [background, text] pairs for avatars and icon squares. CSS tokens, so they follow the theme.
 export const TONES = [
-  ['var(--mint)', 'var(--mint-ink)'],
-  ['var(--butter)', 'var(--butter-ink)'],
-  ['var(--pink)', 'var(--pink-ink)'],
-  ['var(--violet-soft)', 'var(--violet-ink)'],
-  ['var(--peach)', 'var(--peach-ink)'],
+  ['var(--accent-soft)', 'var(--accent-ink)'],
+  ['var(--info-soft)', 'var(--info)'],
+  ['var(--warning-soft)', 'var(--warning)'],
+  ['var(--danger-soft)', 'var(--danger)'],
+  ['var(--success-soft)', 'var(--success)'],
 ]
 export const tone = (i) => TONES[Math.abs(i) % TONES.length]
 
@@ -59,17 +59,17 @@ export const SOURCE_LABEL = {
 }
 
 export const RES_STATUS = {
-  Confirmed: { label: 'დადასტურებული', cls: 'tone-mint' },
-  Waitlisted: { label: 'მოლოდინის სიაში', cls: 'tone-butter' },
-  Cancelled: { label: 'გაუქმებული', cls: 'tone-white' },
-  Expired: { label: 'ვადაგასული', cls: 'tone-peach' },
-  Redeemed: { label: 'გატანილი', cls: 'tone-violet' },
+  Confirmed: { label: 'დადასტურებული', cls: 'tone-success' },
+  Waitlisted: { label: 'მოლოდინის სიაში', cls: 'tone-warning' },
+  Cancelled: { label: 'გაუქმებული', cls: 'tone-neutral' },
+  Expired: { label: 'ვადაგასული', cls: 'tone-danger' },
+  Redeemed: { label: 'გატანილი', cls: 'tone-accent' },
 }
 
 export const DEAL_STATUS = {
-  Draft: { label: 'მონახაზი', cls: 'tone-white' },
-  Open: { label: 'ჯგუფი გროვდება', cls: 'tone-butter' },
-  Activated: { label: 'ჯგუფი შეივსო', cls: 'tone-mint' },
-  Failed: { label: 'ვერ შეგროვდა', cls: 'tone-pink' },
-  Closed: { label: 'დასრულებული', cls: 'tone-violet' },
+  Draft: { label: 'მონახაზი', cls: 'tone-neutral' },
+  Open: { label: 'ჯგუფი გროვდება', cls: 'tone-warning' },
+  Activated: { label: 'ჯგუფი შეივსო', cls: 'tone-success' },
+  Failed: { label: 'ვერ შეგროვდა', cls: 'tone-danger' },
+  Closed: { label: 'დასრულებული', cls: 'tone-neutral' },
 }

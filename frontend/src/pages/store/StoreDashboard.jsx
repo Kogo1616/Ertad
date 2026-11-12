@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../../api'
 import { ErrorBox, Loading, useLoad } from '../../components/ui'
-import { money, tbilisiLocalToIso, tone } from '../../format'
+import { money, tbilisiLocalToIso } from '../../format'
 import { defaultDeadline, PriceBars } from './shared'
 
 export default function StoreDashboard() {
@@ -30,17 +30,17 @@ export default function StoreDashboard() {
       </div>
 
       <div className="kpis">
-        <div className="kpi tone-violet"><span>დაინტერესებული</span><strong style={{ color: 'var(--violet-ink)' }}>{kpis.interested}</strong></div>
-        <div className="kpi tone-mint"><span>აქტიური შეთავაზება</span><strong style={{ color: 'var(--mint-ink)' }}>{kpis.activeDeals}</strong></div>
-        <div className="kpi tone-butter"><span>ჯავშანი</span><strong style={{ color: 'var(--butter-ink)' }}>{kpis.reserved} / {kpis.needed}</strong></div>
-        <div className="kpi tone-pink"><span>გატანილი</span><strong style={{ color: 'var(--pink-ink)' }}>{kpis.redeemed}</strong></div>
+        <div className="kpi"><span>დაინტერესებული</span><strong>{kpis.interested}</strong></div>
+        <div className="kpi"><span>აქტიური შეთავაზება</span><strong>{kpis.activeDeals}</strong></div>
+        <div className="kpi hl"><span>ჯავშანი</span><strong>{kpis.reserved} / {kpis.needed}</strong></div>
+        <div className="kpi"><span>გატანილი</span><strong>{kpis.redeemed}</strong></div>
       </div>
 
       <div className="split" style={{ gap: 20, alignItems: 'flex-start' }}>
         <section className="stack" style={{ flex: '2 1 420px', gap: 10 }}>
           {products.map((p, i) => {
-            const [bg, fg] = tone(i + 3)
-            const bar = ['#6A4BE0', '#3FBF8E', '#E8B931', '#F07AAE', '#F09A6A'][i % 5]
+            const [bg, fg] = ['var(--surface-2)', 'var(--ink)']
+            const bar = p.id === selectedId ? 'var(--accent)' : 'var(--muted)'
             return (
               <button key={p.id} type="button" className={'prow' + (p.id === selectedId ? ' selected' : '')} aria-pressed={p.id === selectedId} onClick={() => setSelectedId(p.id)}>
                 <span className="icon-square" style={{ background: bg, color: fg }}>{p.name[0]}</span>
@@ -100,7 +100,7 @@ function OfferPanel({ product, onPublished }) {
   return (
     <section className="card" style={{ flex: '1 1 340px', gap: 18 }}>
       <div className="stack-sm" style={{ gap: 2 }}>
-        <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--accent)' }}>არჩეული</span>
+        <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--accent-ink)' }}>არჩეული</span>
         <h2 style={{ fontSize: 20 }}>{product.name} · {money(product.regularPrice)}</h2>
         <span className="small muted">{demand.interestCount} ითხოვს · {demand.withPrice}-მა მიუთითა ფასი</span>
       </div>

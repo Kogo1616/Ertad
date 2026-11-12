@@ -40,6 +40,9 @@ Where the spec was ambiguous or the request changed it, we took the simplest opt
 ## Tests
 - Integration tests run against real PostgreSQL. With `ERTAD_TEST_DB` set (a server connection string), they use that server and create and drop one database per test. Without it, they start a Testcontainers `postgres:17-alpine` container (needs Docker).
 
-## Dark mode
-- Colors are CSS custom properties in `styles.css`. Dark values apply when the OS prefers dark, unless the user has chosen a theme with the header/sidebar toggle. The choice is stored in `localStorage` (`ertad-theme`) and set as `<html data-theme>` by an inline script in `index.html` before first paint, so there's no flash.
-- Violet buttons stay `#6A4BE0` in both modes (white text passes 4.5:1). Violet used as *text* is a separate token (`--accent`), lighter in dark mode.
+## Visual design
+- **Direction C, dark and modern** (chosen 2026-11-12): near-black background (#0C0F14), slightly lighter cards with 1px borders, and a single lime accent (#B8F23A). The pastel/violet look from the mockups is gone.
+- **Lime is used sparingly**, only where it should pull attention: the group price, the main button, progress bars, the discount badge and the selected item. Everything else is neutral, so the accent keeps working. Status colors (green, amber, red, sky) are muted, soft-background chips.
+- **Shape:** cards have a 16px radius, buttons, chips and filters are pills, and inputs have a 12px radius. There are no shadows or gradients; a small hover lift on cards is disabled under prefers-reduced-motion.
+- **Dark is the default.** Light is opt-in through the header/sidebar toggle, stored in localStorage () and applied by an inline script in index.html before first paint. In light mode lime can't be used as text on white, so prices and links switch to a dark olive (, #3F6212), and lime stays as a fill only.
+- All colors live as CSS custom properties in . Components use tokens only, no hex values, except purely decorative SVG.

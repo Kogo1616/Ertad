@@ -37,10 +37,10 @@ export default function DealsPage() {
         </div>
       )}
 
-      <section className="cta-band tone-violet">
+      <section className="cta-band">
         <div className="stack-sm">
-          <span style={{ fontSize: 18, fontWeight: 800, color: 'var(--violet-ink)' }}>სასურველი ნივთი არ ჩანს?</span>
-          <span style={{ fontSize: 14 }}>იპოვე ის მაღაზიის კატალოგში და მოითხოვე ჯგუფური ფასი</span>
+          <strong>სასურველი ნივთი არ ჩანს?</strong>
+          <span className="muted" style={{ fontSize: 14 }}>იპოვე ის მაღაზიის კატალოგში და მოითხოვე ჯგუფური ფასი</span>
         </div>
         <Link to="/stores" className="btn">მაღაზიების კატალოგი</Link>
       </section>

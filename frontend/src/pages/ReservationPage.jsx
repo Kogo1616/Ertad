@@ -7,14 +7,14 @@ import { money, when } from '../format'
 function Confetti() {
   return (
     <svg aria-hidden="true" className="confetti" viewBox="0 0 1000 200" preserveAspectRatio="xMidYMid meet">
-      <circle cx="140" cy="50" r="10" fill="#FFD9EA" />
-      <rect x="820" y="40" width="20" height="20" rx="4" fill="#FFF1BF" transform="rotate(20 830 50)" />
-      <circle cx="880" cy="150" r="12" fill="#CFF3E4" />
-      <rect x="200" y="150" width="16" height="16" rx="3" fill="#E9E3FF" transform="rotate(-15 208 158)" />
-      <circle cx="740" cy="170" r="8" fill="#FFE2D2" />
-      <circle cx="290" cy="30" r="7" fill="#B9ADEF" />
-      <rect x="80" y="120" width="14" height="14" rx="3" fill="#FFF1BF" transform="rotate(30 87 127)" />
-      <circle cx="660" cy="40" r="6" fill="#FFD9EA" />
+      <circle cx="140" cy="50" r="10" style={{ fill: 'var(--accent)' }} opacity=".7" />
+      <rect x="820" y="40" width="20" height="20" rx="4" style={{ fill: 'var(--accent)' }} opacity=".35" transform="rotate(20 830 50)" />
+      <circle cx="880" cy="150" r="12" style={{ fill: 'var(--accent)' }} />
+      <rect x="200" y="150" width="16" height="16" rx="3" style={{ fill: 'var(--muted)' }} opacity=".5" transform="rotate(-15 208 158)" />
+      <circle cx="740" cy="170" r="8" style={{ fill: 'var(--accent)' }} opacity=".5" />
+      <circle cx="290" cy="30" r="7" style={{ fill: 'var(--muted)' }} opacity=".4" />
+      <rect x="80" y="120" width="14" height="14" rx="3" style={{ fill: 'var(--accent)' }} opacity=".35" transform="rotate(30 87 127)" />
+      <circle cx="660" cy="40" r="6" style={{ fill: 'var(--accent)' }} opacity=".7" />
     </svg>
   )
 }
@@ -23,7 +23,7 @@ function Headline({ icon, bg, fg, title, text }) {
   return (
     <div className="stack center" style={{ position: 'relative', gap: 12 }}>
       <div className="big-icon" style={{ background: bg, color: fg, fontSize: 38, fontWeight: 800 }}>{icon}</div>
-      <h1 style={{ fontSize: 40 }}>{title}</h1>
+      <h1 style={{ fontSize: 36 }}>{title}</h1>
       <p className="muted" style={{ fontSize: 16 }}>{text}</p>
     </div>
   )
@@ -58,7 +58,7 @@ export default function ReservationPage() {
       {r.status === 'Confirmed' && r.code && (
         <>
           <Confetti />
-          <Headline icon={<CheckIcon />} bg="var(--mint)" fg="var(--mint-ink)" title="ჯგუფი შეივსო!"
+          <Headline icon={<CheckIcon />} bg="var(--accent)" fg="var(--on-accent)" title="ჯგუფი შეივსო!"
             text={`${deal.confirmed}-მა ადამიანმა ერთად მოიპოვა ${money(deal.groupPrice)}-იანი ფასი. შენ ${money(r.saving)} დაზოგე.`} />
           <section className="ticket">
             <div className="ticket-left">
@@ -84,19 +84,19 @@ export default function ReservationPage() {
 
       {r.status === 'Confirmed' && !r.code && (
         <>
-          <Headline icon="⏳" bg="var(--butter)" fg="var(--butter-ink)" title="ადგილი დაჯავშნილია!"
+          <Headline icon="⏳" bg="var(--warning-soft)" fg="var(--warning)" title="ადგილი დაჯავშნილია!"
             text={`ჯგუფს კიდევ ${need} სჭირდება ${when(deal.deadline)}-მდე. შეივსება თუ არა — SMS-ით გაცნობებთ.`} />
           <section className="card" style={{ gap: 14 }}>
             <div className="row between">
               <strong style={{ fontSize: 18 }}>{deal.productName} · {money(deal.groupPrice)}</strong>
-              <span className="chip tone-peach">კიდევ {need}!</span>
+              <span className="chip tone-warning">კიდევ {need}!</span>
             </div>
             <Progress value={deal.confirmed} max={deal.min} />
             <span className="small"><strong>{deal.confirmed} / {deal.min} ჯავშანი</strong> · წინასწარ არაფერს იხდი</span>
             <label htmlFor="share" style={{ fontSize: 13, fontWeight: 700 }}>მოიწვიე მეგობარი</label>
             <div className="row" style={{ gap: 8, flexWrap: 'nowrap' }}>
               <input id="share" className="input" style={{ fontSize: 14, fontWeight: 500 }} readOnly value={shareUrl} />
-              <CopyButton text={shareUrl} className="btn btn-sm" style={{ height: 48 }} />
+              <CopyButton text={shareUrl} className="btn btn-soft btn-sm" style={{ height: 46 }} />
             </div>
             <div className="row">
               <Link to={`/d/${deal.slug}`} className="btn btn-soft">შეთავაზების ნახვა</Link>
@@ -108,7 +108,7 @@ export default function ReservationPage() {
 
       {r.status === 'Waitlisted' && (
         <>
-          <Headline icon="#" bg="var(--violet-soft)" fg="var(--violet-ink)" title={`მოლოდინის სიაში ხარ — №${r.waitlistPosition}`}
+          <Headline icon="#" bg="var(--surface-2)" fg="var(--ink)" title={`მოლოდინის სიაში ხარ — №${r.waitlistPosition}`}
             text="მარაგი ამჟამად სავსეა. თუ ვინმე გააუქმებს ან არ გაიტანს, ადგილი შენ გადმოგეცემა და SMS-ს მიიღებ." />
           <div className="row" style={{ justifyContent: 'center' }}>
             <Link to={`/d/${deal.slug}`} className="btn btn-soft">შეთავაზების ნახვა</Link>
@@ -118,19 +118,19 @@ export default function ReservationPage() {
       )}
 
       {r.status === 'Cancelled' && (
-        <Headline icon="×" bg="var(--pink)" fg="var(--pink-ink)"
+        <Headline icon="×" bg="var(--danger-soft)" fg="var(--danger)"
           title={deal.status === 'Failed' ? 'ჯგუფი ვერ შეგროვდა' : 'ჯავშანი გაუქმებულია'}
           text={deal.status === 'Failed' ? 'ვადაში საკმარისი ადამიანი ვერ შეგროვდა. არაფერი გადაგიხდია.' : 'ჯავშანი გაუქმდა. არაფერი გადაგიხდია.'} />
       )}
 
       {r.status === 'Expired' && (
-        <Headline icon="!" bg="var(--peach)" fg="var(--peach-ink)" title="გატანის ვადა გავიდა"
+        <Headline icon="!" bg="var(--warning-soft)" fg="var(--warning)" title="გატანის ვადა გავიდა"
           text={`კოდი ${when(r.pickupDeadline)}-მდე მოქმედებდა. ადგილი მოლოდინის სიაში მყოფს გადაეცა.`} />
       )}
 
       {r.status === 'Redeemed' && (
         <>
-          <Headline icon={<CheckIcon />} bg="var(--mint)" fg="var(--mint-ink)" title="ნივთი გატანილია"
+          <Headline icon={<CheckIcon />} bg="var(--success-soft)" fg="var(--success)" title="ნივთი გატანილია"
             text={`${deal.productName} · ${money(deal.groupPrice)} · ${when(r.redeemedAt)}`} />
           <section className="card center" style={{ gap: 12 }}>
             {r.buyerConfirmedPickup == null ? (
@@ -150,9 +150,9 @@ export default function ReservationPage() {
 
       <ErrorBox error={error} />
 
-      <div className="cta-band tone-butter" style={{ padding: '18px 22px', color: 'var(--butter-ink)' }}>
+      <div className="cta-band" style={{ padding: '18px 22px' }}>
         <span style={{ fontSize: 15, fontWeight: 600 }}>მოგეწონა? ნახე სხვა ნივთები, რომლებზეც ხალხი ფასს ითხოვს</span>
-        <Link to="/deals" className="btn-dark" style={{ background: 'var(--surface)', color: 'var(--butter-ink)' }}>შეთავაზებების ნახვა</Link>
+        <Link to="/deals" className="btn btn-sm">შეთავაზებების ნახვა</Link>
       </div>
     </main>
   )

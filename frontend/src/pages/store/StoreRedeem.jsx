@@ -4,11 +4,11 @@ import { CheckIcon, ErrorBox, StatusChip, useLoad } from '../../components/ui'
 import { RES_STATUS, SOURCE_LABEL, dateTime, money, when } from '../../format'
 
 const RESULT = {
-  Valid: { title: 'კოდი მოქმედია', cls: 'tone-mint' },
-  AlreadyRedeemed: { title: 'კოდი უკვე გამოყენებულია', cls: 'tone-butter' },
-  Expired: { title: 'კოდს ვადა გაუვიდა', cls: 'tone-peach' },
-  Cancelled: { title: 'ჯავშანი გაუქმებულია', cls: 'tone-pink' },
-  NotFound: { title: 'კოდი ვერ მოიძებნა', cls: 'tone-pink' },
+  Valid: { title: 'კოდი მოქმედია', cls: 'tone-success' },
+  AlreadyRedeemed: { title: 'კოდი უკვე გამოყენებულია', cls: 'tone-warning' },
+  Expired: { title: 'კოდს ვადა გაუვიდა', cls: 'tone-warning' },
+  Cancelled: { title: 'ჯავშანი გაუქმებულია', cls: 'tone-danger' },
+  NotFound: { title: 'კოდი ვერ მოიძებნა', cls: 'tone-danger' },
 }
 
 export default function StoreRedeem() {
@@ -83,8 +83,8 @@ export default function StoreRedeem() {
           <div className="row between">
             <h2 style={{ fontSize: 18 }}>{table.deal.productName} — ჯავშნები</h2>
             <div className="row" style={{ gap: 8 }}>
-              <span className="chip tone-butter" style={{ fontSize: 13 }}>გაიტანეს {table.redeemed}</span>
-              <span className="chip tone-pink" style={{ fontSize: 13 }}>ელოდება {table.waiting}</span>
+              <span className="chip tone-warning" style={{ fontSize: 13 }}>გაიტანეს {table.redeemed}</span>
+              <span className="chip tone-danger" style={{ fontSize: 13 }}>ელოდება {table.waiting}</span>
             </div>
           </div>
           <div className="table-wrap">

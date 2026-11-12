@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { api } from '../../api'
 import { useAuth } from '../../auth'
 import { DealCard, ErrorBox, Loading, SearchIcon, StatusChip, useLoad } from '../../components/ui'
-import { DEAL_STATUS, money, tbilisiLocalToIso, timeLeft, tone, when } from '../../format'
+import { DEAL_STATUS, money, tbilisiLocalToIso, timeLeft, when } from '../../format'
 import { defaultDeadline } from './shared'
 
 export default function StoreNewDeal() {
@@ -83,7 +83,7 @@ export default function StoreNewDeal() {
             </div>
             <div className="grid-cards" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))', gap: 10 }}>
               {visible.map((p, i) => {
-                const [bg, fg] = tone(i)
+                const [bg, fg] = ['var(--surface-2)', 'var(--ink)']
                 return (
                   <button key={p.id} type="button" className="pick" aria-pressed={p.id === productId} onClick={() => setProductId(p.id)}>
                     <span className="icon-square" style={{ background: bg, color: fg }}>{p.name[0]}</span>

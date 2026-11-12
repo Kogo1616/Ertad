@@ -47,11 +47,11 @@ function Report({ dealId }) {
       </section>
 
       <div className="kpis">
-        <div className="kpi tone-violet"><span>დაინტერესებული</span><strong>{r.interestCount}</strong></div>
-        <div className="kpi tone-butter"><span>ჯავშანი</span><strong>{r.reservations.confirmed}</strong><span className="small">მოლოდინში {r.reservations.waitlisted} · გაუქმდა {r.reservations.cancelled}</span></div>
-        <div className="kpi tone-mint"><span>აქტიურდა?</span><strong>{r.activated ? 'დიახ' : 'არა'}</strong></div>
-        <div className="kpi tone-pink"><span>გატანილი</span><strong>{r.redeemed}</strong><span className="small">არ მოვიდა: {r.noShows}</span></div>
-        <div className="kpi tone-peach"><span>საკომისიო</span><strong>{money(r.commissionTotal)}</strong></div>
+        <div className="kpi"><span>დაინტერესებული</span><strong>{r.interestCount}</strong></div>
+        <div className="kpi"><span>ჯავშანი</span><strong>{r.reservations.confirmed}</strong><span className="small muted">მოლოდინში {r.reservations.waitlisted} · გაუქმდა {r.reservations.cancelled}</span></div>
+        <div className="kpi"><span>აქტიურდა?</span><strong>{r.activated ? 'დიახ' : 'არა'}</strong></div>
+        <div className="kpi"><span>გატანილი</span><strong>{r.redeemed}</strong><span className="small muted">არ მოვიდა: {r.noShows}</span></div>
+        <div className="kpi hl"><span>საკომისიო</span><strong>{money(r.commissionTotal)}</strong></div>
       </div>
 
       <div className="split" style={{ gap: 20 }}>

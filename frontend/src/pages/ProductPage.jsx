@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../api'
 import { isBuyer, useAuth } from '../auth'
 import { AvatarStack, CopyButton, DealCard, ErrorBox, HowItWorks, Loading, LockIcon, ProductImage, useLoad } from '../components/ui'
-import { money, tone } from '../format'
+import { money } from '../format'
 import { ProductGrid } from './StorePage'
 
 export default function ProductPage() {
@@ -49,8 +49,6 @@ export default function ProductPage() {
     } catch (e) { setError(e.message) } finally { setBusy(false) }
   }
 
-  const [bg] = tone(p.id)
-
   return (
     <main className="page" style={{ gap: 28 }}>
       <nav aria-label="ნავიგაცია" className="row small muted" style={{ gap: 8 }}>
@@ -61,18 +59,14 @@ export default function ProductPage() {
 
       <div className="split" style={{ gap: 28 }}>
         <div style={{ flex: '1 1 480px' }}>
-          <ProductImage id={p.id} name={p.name} imageUrl={p.imageUrl} height={440} radius={32}>
-            {!p.imageUrl && <>
-              <span aria-hidden="true" style={{ position: 'absolute', width: 300, height: 300, borderRadius: '50%', background: 'rgba(255,255,255,.35)', right: -80, top: -90 }} />
-              <span aria-hidden="true" style={{ position: 'absolute', width: 150, height: 150, borderRadius: '50%', background: 'var(--butter)', left: 40, bottom: -50, opacity: bg === 'var(--butter)' ? 0 : 1 }} />
-              <span className="chip pimg-badge" style={{ left: 20, top: 20, background: 'var(--surface)', color: 'var(--mint-ink)' }}>[პროდუქტის ფოტო]</span>
-            </>}
+          <ProductImage name={p.name} imageUrl={p.imageUrl} height={440} radius="var(--r-lg)">
+            {!p.imageUrl && <span className="chip pimg-badge badge-origin" style={{ left: 16, top: 16 }}>[პროდუქტის ფოტო]</span>}
           </ProductImage>
         </div>
 
         <div className="stack" style={{ flex: '1 1 400px', gap: 18 }}>
-          <Link to={`/stores/${p.store.id}`} className="chip" style={{ alignSelf: 'flex-start', background: 'var(--surface)', color: 'var(--ink)', padding: '6px 14px 6px 6px', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>
-            <span className="avatar" style={{ width: 28, height: 28, border: 0, background: 'var(--peach)', color: 'var(--peach-ink)' }}>{p.store.name.replace('[', '')[0]}</span>
+          <Link to={`/stores/${p.store.id}`} className="chip" style={{ alignSelf: 'flex-start', background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--ink)', padding: '4px 12px 4px 4px', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>
+            <span className="avatar" style={{ width: 26, height: 26, border: 0, background: 'var(--accent-soft)', color: 'var(--accent-ink)' }}>{p.store.name.replace('[', '')[0]}</span>
             {p.store.name} · {p.store.city}
           </Link>
           <div className="stack-sm" style={{ gap: 4 }}>

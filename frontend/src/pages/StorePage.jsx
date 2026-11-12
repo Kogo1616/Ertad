@@ -8,13 +8,13 @@ export function ProductGrid({ products }) {
     <div className="grid-auto">
       {products.map((p) => (
         <Link key={p.id} to={`/stores/${p.storeId}/products/${p.id}`} className="product-card">
-          <ProductImage id={p.id} name={p.name} imageUrl={p.imageUrl} height={140} radius={18}>
-            {p.dealSlug && <span className="chip pimg-badge" style={{ background: 'var(--violet)', color: '#fff' }}>ჯგუფური {money(p.dealPrice)}</span>}
+          <ProductImage name={p.name} imageUrl={p.imageUrl} height={140} radius={18}>
+            {p.dealSlug && <span className="chip pimg-badge" style={{ background: 'var(--accent)', color: 'var(--on-accent)' }}>ჯგუფური {money(p.dealPrice)}</span>}
           </ProductImage>
           <span style={{ fontSize: 15, fontWeight: 700, padding: '0 4px' }}>{p.name}</span>
           <span className="row between" style={{ padding: '0 4px 4px', fontSize: 14 }}>
             <strong>{money(p.regularPrice)}</strong>
-            <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{p.interestCount > 0 ? `${p.interestCount} ითხოვს` : 'მოითხოვე პირველმა'}</span>
+            <span style={{ color: 'var(--accent-ink)', fontWeight: 700 }}>{p.interestCount > 0 ? `${p.interestCount} ითხოვს` : 'მოითხოვე პირველმა'}</span>
           </span>
         </Link>
       ))}

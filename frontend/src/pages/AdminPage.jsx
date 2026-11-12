@@ -118,7 +118,7 @@ function Products() {
               <td>{p.id}</td>
               <td>
                 {p.imageUrl && <img src={p.imageUrl} alt="" width="48" height="48" style={{ objectFit: 'cover', borderRadius: 10, display: 'block', marginBottom: 4 }} />}
-                <label className="small" style={{ cursor: 'pointer', color: 'var(--accent)', fontWeight: 700 }}>
+                <label className="small" style={{ cursor: 'pointer', color: 'var(--accent-ink)', fontWeight: 700 }}>
                   ატვირთვა<input type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={(e) => e.target.files[0] && upload(p.id, e.target.files[0])} />
                 </label>
               </td>

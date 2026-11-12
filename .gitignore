@@ -6,3 +6,4 @@ node_modules/
 .vscode/
 # built React app and uploaded images
 backend/Ertad.Api/wwwroot/
+.superpowers/
